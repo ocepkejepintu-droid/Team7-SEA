@@ -1,11 +1,12 @@
-import { Map, Trophy, UserRound } from "lucide-react";
+import { Hammer, Map, Trophy, UserRound } from "lucide-react";
 import { useI18n, type Key } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-export type Tab = "map" | "league" | "me";
+export type Tab = "map" | "league" | "workshop" | "me";
 const TABS: { id: Tab; label: Key; Icon: typeof Map }[] = [
   { id: "map", label: "tab.map", Icon: Map },
   { id: "league", label: "tab.league", Icon: Trophy },
+  { id: "workshop", label: "tab.workshop", Icon: Hammer },
   { id: "me", label: "tab.me", Icon: UserRound },
 ];
 
