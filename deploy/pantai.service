@@ -1,0 +1,20 @@
+[Unit]
+Description=Pantai League (web app + API)
+After=network.target
+
+[Service]
+User=pantai
+Group=pantai
+WorkingDirectory=/opt/pantai
+EnvironmentFile=/etc/pantai/pantai.env
+ExecStart=/usr/bin/env node /opt/pantai/server.mjs
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/pantai
+
+[Install]
+WantedBy=multi-user.target
