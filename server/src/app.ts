@@ -72,7 +72,7 @@ function decodePhoto(v: unknown): { b64: string; buf: Buffer } {
 const newId = () => crypto.randomBytes(9).toString("base64url");
 
 export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
-  const store: Store = createStore(opts.dataDir ?? process.env.DATA_DIR ?? path.resolve("server/data"));
+  const store: Store = createStore(opts.dataDir);
   const webDir = opts.webDir ?? resolveWebDir();
   const beachList = beaches.map((b) => ({ id: b.id, name: b.name }));
   const aiCalls = new Map<string, number[]>();

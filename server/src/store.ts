@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Player, Report } from "../../shared/types";
 
 export type StoredPlayer = Player & { token: string };
@@ -15,7 +16,12 @@ export interface Store {
   playerByToken(token: string | undefined | null): StoredPlayer | undefined;
 }
 
-export function createStore(dataDir: string = process.env.DATA_DIR || path.resolve("server/data")): Store {
+function defaultDataDir(): string {
+  if (process.env.DATA_DIR) return path.resolve(process.env.DATA_DIR);
+  try { return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../data"); } catch { return path.resolve("server/data"); }
+}
+
+export function createStore(dataDir: string = defaultDataDir()): Store {
   const photosDir = path.join(dataDir, "photos");
   fs.mkdirSync(photosDir, { recursive: true });
   const file = path.join(dataDir, "db.json");

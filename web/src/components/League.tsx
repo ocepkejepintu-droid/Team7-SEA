@@ -76,7 +76,7 @@ function Beaches({ league, onOpen }: { league: BeachStanding[]; onOpen: (id: str
         <div className="flex items-center gap-4">
           <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-amber-soft text-3xl" aria-hidden>🏆</span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-ink">Cleanest beach this week</p>
+            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-ink">This week's winner</p>
             <p className="truncate text-2xl font-extrabold">{winner.name}</p>
           </div>
           <div className="text-right">
@@ -85,7 +85,7 @@ function Beaches({ league, onOpen }: { league: BeachStanding[]; onOpen: (id: str
           </div>
         </div>
         <HealthBar health={winner.health} className="mt-4 h-3" />
-        <p className="mt-2 text-sm font-semibold text-muted-foreground">{winner.open} open · {winner.cleanedThisWeek} cleaned this week</p>
+        <p className="mt-2 text-sm font-semibold text-muted-foreground">Cleanest beach this week · {winner.open} open · {winner.cleanedThisWeek} cleaned</p>
       </button>
 
       {rest.length > 0 && (
