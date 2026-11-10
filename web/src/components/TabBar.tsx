@@ -1,16 +1,18 @@
 import { Map, Trophy, UserRound } from "lucide-react";
+import { useI18n, type Key } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export type Tab = "map" | "league" | "me";
-const TABS: { id: Tab; label: string; Icon: typeof Map }[] = [
-  { id: "map", label: "Map", Icon: Map },
-  { id: "league", label: "League", Icon: Trophy },
-  { id: "me", label: "Me", Icon: UserRound },
+const TABS: { id: Tab; label: Key; Icon: typeof Map }[] = [
+  { id: "map", label: "tab.map", Icon: Map },
+  { id: "league", label: "tab.league", Icon: Trophy },
+  { id: "me", label: "tab.me", Icon: UserRound },
 ];
 
 export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
+  const { t } = useI18n();
   return (
-    <nav className="relative z-20 shrink-0 border-t bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur" aria-label="Main">
+    <nav className="relative z-20 shrink-0 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur" aria-label={t("tab.aria")}>
       <div className="mx-auto flex max-w-md">
         {TABS.map(({ id, label, Icon }) => {
           const active = tab === id;
@@ -28,7 +30,7 @@ export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void
               <span className={cn("grid h-8 w-14 place-items-center rounded-full transition-colors", active && "bg-brand-soft")}>
                 <Icon className="size-5" strokeWidth={active ? 2.5 : 2} />
               </span>
-              {label}
+              {t(label)}
             </button>
           );
         })}
