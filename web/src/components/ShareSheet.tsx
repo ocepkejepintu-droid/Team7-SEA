@@ -14,9 +14,9 @@ const TABS: { kind: CardKind; label: string; locked: string }[] = [
 ];
 
 const TEXT: Record<CardKind, string> = {
-  cleanup: "I cleaned up a beach in Bali with Pantai League 🌊",
-  player: "My Pantai League card. Think you can beat me? 🌊",
-  beach: "How clean is our beach this week? Pantai League 🌊",
+  cleanup: "I cleaned up a beach in Bali with Hai Pantai 🌊",
+  player: "My Hai Pantai card. Think you can beat me? 🌊",
+  beach: "How clean is our beach this week? Hai Pantai 🌊",
 };
 
 /** Instagram story cards. Opens on `kind`; reportId / beachId pick what the card is about. */

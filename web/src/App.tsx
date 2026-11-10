@@ -8,10 +8,12 @@ import { Profile } from "@/components/Profile";
 import { TabBar, type Tab } from "@/components/TabBar";
 import { ShareSheet } from "@/components/ShareSheet";
 import type { CardKind } from "@/lib/share";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export function App() {
   const game = useGame();
+  const { t } = useI18n();
   const [tab, setTab] = useState<Tab>("map");
   const [focus, setFocus] = useState<MapFocus>({ n: 0 });
   const [share, setShare] = useState<ShareTarget | null>(null);
@@ -25,7 +27,7 @@ export function App() {
     <div className="flex h-dvh flex-col overflow-hidden bg-canvas">
       {game.error && (
         <div role="status" className="relative z-30 flex shrink-0 items-center justify-center gap-2 bg-coral px-4 pt-[max(0.375rem,env(safe-area-inset-top))] pb-1.5 text-center text-sm font-bold text-white">
-          <WifiOff className="size-4 shrink-0" /> {game.error}. Retrying…
+          <WifiOff className="size-4 shrink-0" /> {t("app.offline")}
         </div>
       )}
       <main className="relative min-h-0 flex-1">

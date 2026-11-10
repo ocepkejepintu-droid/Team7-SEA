@@ -232,7 +232,7 @@ function lockup(ctx: Ctx, y: number, color: string) {
   ctx.textAlign = "center"; ctx.fillStyle = color; ctx.font = font(900, 38);
   ctx.save();
   if ("letterSpacing" in ctx) (ctx as Ctx & { letterSpacing: string }).letterSpacing = "6px";
-  ctx.fillText("🌊 PANTAI LEAGUE · BALI", W / 2, y);
+  ctx.fillText("🌊 HAI PANTAI · BALI", W / 2, y);
   ctx.restore();
 }
 
