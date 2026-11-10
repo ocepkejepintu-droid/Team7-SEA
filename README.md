@@ -1,4 +1,4 @@
-# Pantai League
+# Hai Pantai
 
 A phone-first web app for the Bali coast. People report trash with a photo and a pin, anyone can clean it up and post an after photo, and beaches compete: the beach with the fewest open reports wins the week. Players earn personal points and badges.
 

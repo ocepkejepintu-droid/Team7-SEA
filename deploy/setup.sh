@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs or updates Pantai League on the VPS. Run from the unpacked release:
+# Installs or updates Hai Pantai on the VPS. Run from the unpacked release:
 #   tar xzf pantai.tgz && sudo bash pantai/deploy/setup.sh
 set -euo pipefail
 [ "$(id -u)" = 0 ] || { echo "Run with sudo."; exit 1; }

@@ -1,4 +1,4 @@
-# Pantai League: design
+# Hai Pantai: design
 
 Working name, rename freely. Status: agreed in chat on 10 Nov 2026, for a hackathon demo due the same day (about 2 hours).
 

@@ -1,4 +1,4 @@
-/* Pantai League map and sheet styles (hex colours: MapLibre DOM lives outside Tailwind's reach here). */
+/* Hai Pantai map and sheet styles (hex colours: MapLibre DOM lives outside Tailwind's reach here). */
 .maplibregl-map { font-family: inherit; }
 .maplibregl-ctrl-attrib.maplibregl-compact { margin: 0 0 6px 6px !important; background: rgba(255, 255, 255, 0.85); font-size: 11px; }
 .maplibregl-ctrl-bottom-left { z-index: 1; }
