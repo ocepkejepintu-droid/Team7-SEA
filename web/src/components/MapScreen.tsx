@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Camera } from "lucide-react";
-import type { Report } from "@shared/types";
+import type { Report, TrashType } from "@shared/types";
 import { beachById, snapToCoast } from "@shared/coast";
 import type { ReportResult } from "@/lib/api";
 import type { Game } from "@/lib/useGame";
@@ -18,7 +18,7 @@ const snap = (lng: number, lat: number): Picked => {
 };
 
 /** The Map tab: map, report button, report sheet and report detail. */
-export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
+export function MapScreen({ game, focus, onReuse }: { game: Game; focus?: MapFocus; onReuse?: (type: TrashType) => void }) {
   const map = useRef<GameMapHandle>(null);
   const reports = useMemo(() => game.state?.reports ?? [], [game.state]);
   const league = useMemo(() => game.state?.league ?? [], [game.state]);
@@ -88,7 +88,7 @@ export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
       )}
 
       {reporting && (
-        <ReportSheet onClose={closeReport} pick={pick} onPickStart={startPick} onPickEnd={endPick} onSubmitted={onSubmitted} />
+        <ReportSheet onClose={closeReport} pick={pick} onPickStart={startPick} onPickEnd={endPick} onSubmitted={onSubmitted} onReuse={onReuse} />
       )}
       {selected && !reporting && <ReportDetail report={selected} game={game} onClose={() => setSelectedId(null)} />}
       <PointsToast />

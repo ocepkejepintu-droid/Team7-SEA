@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Camera, ImageIcon, Loader2, MapPin, Sparkles, X, ArrowLeft } from "lucide-react";
+import { Camera, ImageIcon, Loader2, MapPin, Recycle, Sparkles, X, ArrowLeft } from "lucide-react";
 import { SIZES, TRASH_TYPES, type Size, type Tag, type TrashType } from "@shared/types";
 import { reportPoints } from "@shared/game";
 import { api, ApiError, type ReportResult } from "@/lib/api";
@@ -17,15 +17,21 @@ export const errText = (e: unknown) =>
 
 /** A bottom sheet that leaves the map usable above it (no modal overlay). */
 export function BottomSheet({ children, onClose, label, className }: { children: ReactNode; onClose?: () => void; label: string; className?: string }) {
+  const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!onClose) return;
-    const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const k = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // The Map tab stays mounted (hidden) while other tabs show: ignore Escape then, so it cannot close a kept report.
+      if (ref.current && getComputedStyle(ref.current).visibility === "hidden") return;
+      onClose();
+    };
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);
   }, [onClose]);
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-center">
-      <section role="dialog" aria-label={label}
+      <section ref={ref} role="dialog" aria-label={label}
         className={cn("sheet-in pointer-events-auto relative flex max-h-[85vh] w-full max-w-md flex-col rounded-t-[28px] bg-white shadow-[0_-8px_40px_rgba(18,52,59,0.18)]", className)}>
         <div className="mx-auto mt-2.5 h-1.5 w-11 shrink-0 rounded-full bg-border" aria-hidden />
         {onClose && (
@@ -72,12 +78,13 @@ export function PhotoButtons({ onFile, takeLabel = "Take a photo" }: { onFile: (
 type Step = "photo" | "tags" | "pin";
 export interface Picked { lng: number; lat: number; beachId: string; beachName: string }
 
-export function ReportSheet({ onClose, pick, onPickStart, onPickEnd, onSubmitted }: {
+export function ReportSheet({ onClose, pick, onPickStart, onPickEnd, onSubmitted, onReuse }: {
   onClose: () => void;
   pick: Picked | null;
   onPickStart: () => void;
   onPickEnd: () => void;
   onSubmitted: (r: ReportResult) => Promise<void> | void;
+  onReuse?: (type: TrashType) => void;
 }) {
   const [step, setStep] = useState<Step>("photo");
   const [preview, setPreview] = useState<string | null>(null);
@@ -201,9 +208,17 @@ export function ReportSheet({ onClose, pick, onPickStart, onPickEnd, onSubmitted
               ))}
             </div>
           </div>
-          <div className="flex items-center justify-between rounded-2xl bg-brand-soft px-4 py-3">
-            <span className="font-bold text-brand-ink">You'll earn</span>
-            <span className="text-2xl font-black text-brand">+{reportPoints(size)}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex min-h-11 min-w-40 flex-1 items-center justify-between gap-2 rounded-2xl bg-brand-soft px-4 py-2 whitespace-nowrap">
+              <span className="font-bold text-brand-ink">You'll earn</span>
+              <span className="text-2xl font-black text-brand">+{reportPoints(size)}</span>
+            </div>
+            {onReuse && (
+              <button type="button" onClick={() => onReuse(type)}
+                className="flex min-h-11 shrink-0 grow items-center justify-center gap-1.5 self-stretch rounded-2xl border-2 border-brand bg-white px-3.5 font-extrabold text-brand-ink transition active:scale-95">
+                <Recycle className="size-5 text-brand" /> I want to reuse
+              </button>
+            )}
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={() => setStep("photo")} className="h-13 rounded-2xl bg-muted px-4 font-bold text-foreground">New photo</button>

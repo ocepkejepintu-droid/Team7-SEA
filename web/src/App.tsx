@@ -5,6 +5,8 @@ import { MapScreen, type MapFocus } from "@/components/MapScreen";
 import { Onboarding } from "@/components/Onboarding";
 import { League } from "@/components/League";
 import { Profile } from "@/components/Profile";
+import { Workshop, type WorkshopFocus } from "@/components/Workshop";
+import type { TrashType } from "@shared/types";
 import { TabBar, type Tab } from "@/components/TabBar";
 import { cn } from "@/lib/utils";
 
@@ -12,9 +14,12 @@ export function App() {
   const game = useGame();
   const [tab, setTab] = useState<Tab>("map");
   const [focus, setFocus] = useState<MapFocus>({ n: 0 });
+  const [workshop, setWorkshop] = useState<WorkshopFocus>({ type: null, n: 0 });
 
   const openBeach = useCallback((beachId: string) => { setFocus((f) => ({ beachId, n: f.n + 1 })); setTab("map"); }, []);
   const openReport = useCallback((reportId: string) => { setFocus((f) => ({ reportId, n: f.n + 1 })); setTab("map"); }, []);
+
+  const openWorkshop = useCallback((type: TrashType) => { setWorkshop((w) => ({ type, n: w.n + 1 })); setTab("workshop"); }, []);
 
   if (!game.joined) return <Onboarding game={game} />;
 
@@ -28,11 +33,16 @@ export function App() {
       <main className="relative min-h-0 flex-1">
         {/* The map stays mounted so it is not re-created when switching tabs. */}
         <section className={cn("absolute inset-0", tab !== "map" && "invisible pointer-events-none")} aria-hidden={tab !== "map"}>
-          <MapScreen game={game} focus={focus} />
+          <MapScreen game={game} focus={focus} onReuse={openWorkshop} />
         </section>
         {tab === "league" && (
           <section className="absolute inset-0 overflow-y-auto overscroll-contain">
             <League game={game} onOpenBeach={openBeach} />
+          </section>
+        )}
+        {tab === "workshop" && (
+          <section className="absolute inset-0 overflow-y-auto overscroll-contain">
+            <Workshop focus={workshop} />
           </section>
         )}
         {tab === "me" && (
@@ -41,7 +51,11 @@ export function App() {
           </section>
         )}
       </main>
-      <TabBar tab={tab} onChange={setTab} />
+      <TabBar tab={tab} onChange={(t) => {
+        // Opening the Workshop from the tab bar means "show everything": drop any filter left by "I want to reuse".
+        if (t === "workshop" && tab !== "workshop") setWorkshop((w) => ({ type: null, n: w.n + 1 }));
+        setTab(t);
+      }} />
     </div>
   );
 }
