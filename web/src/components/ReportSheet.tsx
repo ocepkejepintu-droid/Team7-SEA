@@ -32,7 +32,7 @@ export function BottomSheet({ children, onClose, label, className }: { children:
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-center">
       <section ref={ref} role="dialog" aria-label={label}
-        className={cn("sheet-in pointer-events-auto relative flex max-h-[85vh] w-full max-w-md flex-col rounded-t-[28px] bg-white shadow-[0_-8px_40px_rgba(18,52,59,0.18)]", className)}>
+        className={cn("sheet-in pointer-events-auto relative flex max-h-[min(85dvh,calc(100dvh-7rem))] w-full max-w-md flex-col rounded-t-[28px] bg-white shadow-[0_-8px_40px_rgba(18,52,59,0.18)]", className)}>
         <div className="mx-auto mt-2.5 h-1.5 w-11 shrink-0 rounded-full bg-border" aria-hidden />
         {onClose && (
           <button type="button" onClick={onClose} aria-label="Close" className="absolute right-2 top-2 grid size-11 place-items-center rounded-full text-muted-foreground hover:bg-muted">

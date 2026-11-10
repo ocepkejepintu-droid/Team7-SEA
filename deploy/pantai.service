@@ -1,5 +1,5 @@
 [Unit]
-Description=Pantai League (web app + API)
+Description=Hai Pantai (web app + API)
 After=network.target
 
 [Service]

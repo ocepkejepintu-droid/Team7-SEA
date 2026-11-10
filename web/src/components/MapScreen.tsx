@@ -90,7 +90,7 @@ export function MapScreen({ game, focus, onReuse }: { game: Game; focus?: MapFoc
       {reporting && (
         <ReportSheet onClose={closeReport} pick={pick} onPickStart={startPick} onPickEnd={endPick} onSubmitted={onSubmitted} onReuse={onReuse} />
       )}
-      {selected && !reporting && <ReportDetail report={selected} game={game} onClose={() => setSelectedId(null)} />}
+      {selected && !reporting && <ReportDetail key={selected.id} report={selected} game={game} onClose={() => setSelectedId(null)} />}
       <PointsToast />
     </div>
   );
