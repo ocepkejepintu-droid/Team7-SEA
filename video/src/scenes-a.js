@@ -210,10 +210,7 @@ scene({
     const m = $("#lm", root);
     const ms = spring(t - 0.0, 9, 6.5);
     tf($("#l-markw", root), { s: ms, r: (1 - ms) * -25 });
-    tf($(".m-sun", m), { y: (1 - E.outBack(prog(t, 0.25, 0.9), 2.2)) * 26 });
-    tf($(".m-rays", m), { r: t * 30, s: ease(t, 0.5, 1.1, E.outBack) });
-    $(".m-reveal", m).setAttribute("width", (64 * ease(t, 0.35, 0.95, E.inOutCubic)).toFixed(2));
-    draw($(".m-wave", m), ease(t, 0.5, 1.1, E.inOutCubic));
+    markAnim(m, t, 0);
     rise($("#l-word", root), t, 0.45, { stagger: 0.04, dur: 0.8, dist: 220 });
     rise($("#l-eb", root), t, 1.1, { stagger: 0.04 });
     $$(".tg", root).forEach((e, i) => {
@@ -233,6 +230,7 @@ const STEPS = [
   { n: "01", t: "Report", d: "Photo + pin on the coast", e: "📷", bg: "#ffe7e1", ink: "#b83a1e" },
   { n: "02", t: "Clean", d: "After photo, Claude checks it", e: "🧹", bg: "#e6f5f4", ink: "#0b6b68" },
   { n: "03", t: "Compete", d: "Cleanest beach wins the week", e: "🏆", bg: "#fef3c7", ink: "#92400e" },
+  { n: "04", t: "Reuse", d: "Turn trash into something useful", e: "♻️", bg: "#ede9fe", ink: "#5b21b6" },
 ];
 scene({
   name: "steps", t0: S.steps, t1: S.report,
@@ -241,20 +239,20 @@ scene({
       <div class="abs" style="inset:0;background:var(--sand)"></div>
       <div class="abs" style="left:0;right:0;top:120px;text-align:center">
         <div class="eyebrow" id="st-eb" style="color:var(--coral)">How it works</div>
-        <div class="h1" id="st-h" style="margin-top:22px;font-size:100px">One loop. Three moves.</div>
+        <div class="h1" id="st-h" style="margin-top:22px;font-size:100px">One loop. Four moves.</div>
       </div>
       <svg class="abs" style="left:0;top:0" width="1920" height="1080">
-        <path id="st-a1" d="M704 586 L726 610 L704 634 M1174 586 L1196 610 L1174 634" stroke="#12343b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path id="st-a1" d="M570 586 L592 610 L570 634 M970 586 L992 610 L970 634 M1370 586 L1392 610 L1370 634" stroke="#12343b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <path id="st-a2" d="M1150 610 L1200 610" stroke="#12343b" stroke-width="6" stroke-linecap="round" fill="none"/>
-        <path id="st-loop" d="M1420 832 C1420 990 1180 1000 950 1000 C720 1000 480 990 480 846" stroke="#0e9f9a" stroke-width="7" stroke-linecap="round" fill="none"/>
-        <path id="st-head" d="M462 866 L480 836 L498 866" stroke="#0e9f9a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path id="st-loop" d="M1580 832 C1580 990 1250 1000 960 1000 C670 1000 340 990 340 846" stroke="#0e9f9a" stroke-width="7" stroke-linecap="round" fill="none"/>
+        <path id="st-head" d="M322 866 L340 836 L358 866" stroke="#0e9f9a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
       <div class="abs body" id="st-lp" style="left:0;right:0;top:960px;text-align:center;font-size:28px;color:var(--teal-ink);font-weight:900"><span style="background:var(--sand);padding:0 18px">… and the beach gets healthier</span></div>
       ${STEPS.map((s, i) => `
-        <div class="abs card st-card" style="left:${290 + i * 470 - 20}px;top:400px;width:420px;height:420px;border-radius:44px;background:${s.bg};border-color:transparent;padding:40px">
+        <div class="abs card st-card" style="left:${180 + i * 400}px;top:400px;width:360px;height:420px;border-radius:44px;background:${s.bg};border-color:transparent;padding:36px">
           <div style="font-weight:1000;font-size:30px;color:${s.ink};letter-spacing:.1em">${s.n}</div>
           <div class="st-ic" style="width:120px;height:120px;border-radius:36px;background:#fff;display:grid;place-items:center;font-size:66px;margin-top:22px;box-shadow:0 10px 0 rgba(0,0,0,.06)">${s.e}</div>
-          <div style="font-weight:1000;font-size:72px;letter-spacing:-0.03em;margin-top:28px">${s.t}</div>
+          <div style="font-weight:1000;font-size:64px;letter-spacing:-0.03em;margin-top:28px">${s.t}</div>
           <div style="font-weight:800;font-size:28px;color:${s.ink};margin-top:6px">${s.d}</div>
         </div>`).join("")}`;
     split($("#st-eb", root)); split($("#st-h", root));
@@ -263,9 +261,9 @@ scene({
     rise($("#st-eb", root), t, 0.05, { out: 3.9 });
     rise($("#st-h", root), t, 0.1, { stagger: 0.06, out: 3.95 });
     $$(".st-card", root).forEach((c, i) => {
-      const a = 0.3 + i * 0.6, k = spring(t - a, 10, 7);
+      const a = 0.3 + i * 0.45, k = spring(t - a, 10, 7);
       const out = ease(t, 3.9 + i * 0.08, 4.5 + i * 0.08, E.inBack);
-      tf(c, { y: (1 - k) * 260 - out * 140, s: 0.9 + 0.1 * k, r: (1 - k) * (i - 1) * 6, o: (t > a ? Math.min(1, (t - a) * 5) : 0) * (1 - out) });
+      tf(c, { y: (1 - k) * 260 - out * 140, s: 0.9 + 0.1 * k, r: (1 - k) * (i - 1.5) * 5, o: (t > a ? Math.min(1, (t - a) * 5) : 0) * (1 - out) });
       tf($(".st-ic", c), { s: spring(t - a - 0.15, 16, 8), r: Math.sin(t * 3 + i) * 4 });
     });
     const out = 1 - ease(t, 3.9, 4.3);

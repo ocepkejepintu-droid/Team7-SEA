@@ -10,10 +10,11 @@
     report: 31.2,     // 6 bars  step 01
     clean: 45.6,      // 6 bars  step 02
     compete: 60.0,    // 6 bars  step 03
-    game: 74.4,       // 4 bars  badges, hotspots, challenge, players
-    tech: 84.0,       // 4 bars  under the hood
-    finale: 93.6,     // 4 bars  the coast turns green
-    end: 103.2,
+    workshop: 74.4,   // 4 bars  step 04: reuse it
+    game: 84.0,       // 4 bars  badges, hotspots, challenge, players
+    tech: 93.6,       // 4 bars  under the hood
+    finale: 103.2,    // 4 bars  the coast turns green
+    end: 112.8,
   };
 
   // Sound cues, [time, kind, gain]
@@ -34,7 +35,7 @@
   q(S.logo + 1.8, "tap", 0.5); q(S.logo + 2.4, "tap", 0.5); q(S.logo + 3.0, "ding", 0.6);
   q(S.logo + 6.5, "whoosh", 0.7);
   // steps
-  q(S.steps + 0.3, "pop", 0.8); q(S.steps + 0.9, "pop", 0.8); q(S.steps + 1.5, "pop", 0.9);
+  q(S.steps + 0.3, "pop", 0.8); q(S.steps + 0.75, "pop", 0.8); q(S.steps + 1.2, "pop", 0.85); q(S.steps + 1.65, "pop", 0.9);
   q(S.steps + 4.1, "whoosh", 0.8);
   // report
   q(S.report + 0.2, "whooshSoft", 0.6);
@@ -62,6 +63,16 @@
   for (let i = 0; i < 4; i++) q(S.compete + 4.8 + i * 0.6, "sparkle", 0.45);
   q(S.compete + 7.6, "impact", 0.6); q(S.compete + 7.65, "ding", 0.8);
   q(S.compete + 13.8, "whoosh", 0.7);
+  // workshop
+  q(S.workshop + 0.2, "whooshSoft", 0.6);
+  q(S.workshop + 1.4, "tap", 0.9);
+  q(S.workshop + 1.6, "swipe", 0.6);
+  for (let i = 0; i < 3; i++) q(S.workshop + 2.4 + i * 0.2, "pop", 0.6);
+  q(S.workshop + 3.4, "tap", 0.6);
+  q(S.workshop + 4.8, "tap", 0.9);
+  for (let i = 0; i < 4; i++) q(S.workshop + 5.8 + i * 0.3, "blip", 0.5);
+  q(S.workshop + 6.8, "sparkle", 0.6);
+  q(S.workshop + 9.0, "whoosh", 0.6);
   // game layer
   for (let i = 0; i < 6; i++) q(S.game + 0.6 + i * 0.3, "pop", 0.7);
   q(S.game + 5.0, "ding", 0.8);

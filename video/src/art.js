@@ -5,21 +5,39 @@ const C = {
   sea: "#cfe9ea", sun: "#ffd27a", deep: "#062a2e",
 };
 
-// The Hai Pantai mark, split into parts we can animate.
+// The Hai Pantai mark: ocean and sand meeting in an S-shaped wave, a starfish and a turtle.
 function markSVG(id) {
-  return `<svg class="mark" id="${id}" viewBox="0 0 64 64">
-    <defs><clipPath id="${id}-clip"><rect width="64" height="64" rx="16"/></clipPath>
+  return `<svg class="mark" id="${id}" viewBox="0 0 64 64" style="overflow:visible">
+    <defs><clipPath id="${id}-clip"><circle cx="32" cy="32" r="30"/></clipPath>
       <clipPath id="${id}-reveal"><rect class="m-reveal" x="0" y="0" width="64" height="64"/></clipPath></defs>
-    <rect class="m-bg" width="64" height="64" rx="16" fill="${C.teal}"/>
     <g clip-path="url(#${id}-clip)">
-      <g class="m-rays" style="transform-origin:44px 20px">${[...Array(8)].map((_, i) => `<rect x="43" y="6" width="2" height="5" rx="1" fill="${C.sun}" opacity=".7" transform="rotate(${i * 45} 44 20)"/>`).join("")}</g>
-      <circle class="m-sun" cx="44" cy="20" r="7" fill="${C.sun}"/>
-      <g clip-path="url(#${id}-reveal)">
-        <path class="m-sand" d="M6 38c6-6 12-6 18 0s12 6 18 0 12-6 16-2v18a8 8 0 0 1-8 8H14a8 8 0 0 1-8-8z" fill="${C.sand}"/>
+      <rect width="64" height="64" fill="#22a9a9"/>
+      <path class="m-deep" d="M0 0 H20 C11 12 13 26 18 36 C23 46 21 56 15 64 H0Z" fill="#1d8aa7"/>
+      <g class="m-turtle" fill="#7fd3cc" opacity=".75">
+        <ellipse cx="0" cy="0" rx="3.6" ry="3"/><circle cx="4.4" cy="-1.6" r="1.4"/>
+        <ellipse cx="1.8" cy="-3.4" rx="2.2" ry=".9" transform="rotate(-35 1.8 -3.4)"/><ellipse cx="1.8" cy="3.2" rx="2.2" ry=".9" transform="rotate(35 1.8 3.2)"/>
+        <ellipse cx="-2.8" cy="-2.6" rx="1.4" ry=".7" transform="rotate(30 -2.8 -2.6)"/><ellipse cx="-2.8" cy="2.6" rx="1.4" ry=".7" transform="rotate(-30 -2.8 2.6)"/>
       </g>
-      <path class="m-wave" d="M6 46c6-5 12-5 18 0s12 5 18 0 12-5 16-1" fill="none" stroke="${C.teal}" stroke-width="3" stroke-linecap="round"/>
+      <g clip-path="url(#${id}-reveal)">
+        <path class="m-sand" d="M34 0 C24 10 26 22 31 30 C36 38 38 48 30 64 H64 V0Z" fill="#f4d9a4"/>
+        <path d="M47 0 C41 12 44 24 50 32 C56 40 55 54 49 64 H64 V0Z" fill="#e6c387"/>
+      </g>
+      <path class="m-wave" d="M34 -1 C24 10 26 22 31 30 C36 38 38 48 30 65" fill="none" stroke="#fff" stroke-width="4.6" stroke-linecap="round"/>
+      <g class="m-star" fill="#ee6a4c"><path d="M0-4.4 L1.2-1.4 L4.3-1.3 L1.9 0.7 L2.7 3.8 L0 2.1 L-2.7 3.8 L-1.9 0.7 L-4.3-1.3 L-1.2-1.4Z"/></g>
+      <circle class="m-dot" cx="41.5" cy="13.5" r="1.4" fill="#ee6a4c"/>
     </g>
   </svg>`;
+}
+// Animate the mark: k0 is the scene time the mark starts.
+function markAnim(m, t, k0) {
+  $(".m-reveal", m).setAttribute("width", (64 * ease(t, k0 + 0.25, k0 + 0.85, E.inOutCubic)).toFixed(2));
+  draw($(".m-wave", m), ease(t, k0 + 0.3, k0 + 0.95, E.inOutCubic));
+  const sk = spring(t - (k0 + 0.8), 14, 7);
+  $(".m-star", m).setAttribute("transform", `translate(40 21) rotate(${((1 - sk) * -120 + Math.sin(t * 1.5) * 6).toFixed(2)}) scale(${(t < k0 + 0.8 ? 0 : sk).toFixed(3)})`);
+  const dk = spring(t - (k0 + 0.95), 16, 8);
+  $(".m-dot", m).setAttribute("transform", `translate(41.5 13.5) scale(${(t < k0 + 0.95 ? 0 : dk).toFixed(3)}) translate(-41.5 -13.5)`);
+  const tk = ease(t, k0 + 0.5, k0 + 1.6, E.outCubic);
+  $(".m-turtle", m).setAttribute("transform", `translate(${(lerp(8, 24, tk) + Math.sin(t * 1.2) * 0.8).toFixed(2)} ${(lerp(58, 46, tk) + Math.cos(t * 1.4) * 0.6).toFixed(2)}) rotate(${(-40 + tk * 10).toFixed(1)})`);
 }
 
 // A beach "photo". dirty=true draws the trash pile. Boxes for Claude's detections.
@@ -110,7 +128,7 @@ function coastPoint(name, shift = 0) {
 
 // App UI bits
 const chip = (txt, cls = "") => `<span class="chip ${cls}">${txt}</span>`;
-const tabbar = () => `<div class="tabbar"><div class="tab on"><span>🗺️</span>Map</div><div class="tab"><span>🏆</span>League</div><div class="tab"><span>🙂</span>Me</div></div>`;
+const tabbar = () => `<div class="tabbar"><div class="tab on"><span>🗺️</span>Map</div><div class="tab"><span>🏆</span>League</div><div class="tab"><span>🔨</span>Workshop</div><div class="tab"><span>🙂</span>Me</div></div>`;
 // A finger tap indicator
 const tapHTML = (id) => `<div class="tap" id="${id}"><div class="tap-dot"></div><div class="tap-ring"></div></div>`;
 function tapAt(el, t, at) {

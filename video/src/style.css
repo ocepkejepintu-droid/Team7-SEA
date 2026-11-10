@@ -11,7 +11,7 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
-body { font-family: "Nunito", "Noto Color Emoji", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+body { font-family: "Nunito", "Noto Color Emoji", "WenQuanYi Zen Hei", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
 #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--sand); }
 .scene { position: absolute; inset: 0; overflow: hidden; visibility: hidden; }
 .abs { position: absolute; }
@@ -56,7 +56,7 @@ body { font-family: "Nunito", "Noto Color Emoji", system-ui, sans-serif; color: 
 .btn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 64px; border-radius: 22px; font-weight: 900; font-size: 21px; color: #fff; background: var(--teal); box-shadow: 0 8px 0 var(--teal-ink); }
 .btn.coral { background: var(--coral); box-shadow: 0 8px 0 var(--coral-ink); }
 .card { background: #fff; border: 2px solid var(--border); border-radius: 24px; }
-.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #fff; border-top: 2px solid var(--border); display: flex; justify-content: space-around; padding: 10px 30px 0; }
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #fff; border-top: 2px solid var(--border); display: flex; justify-content: space-around; padding: 10px 8px 0; }
 .tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-weight: 800; font-size: 13px; color: var(--muted-ink); }
 .tab span { font-size: 22px; }
 .tab.on { color: var(--teal); }

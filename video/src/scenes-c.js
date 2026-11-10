@@ -191,10 +191,7 @@ scene({
     const ms = spring(t - 4.2, 9, 6.5);
     tf($("#f-markw", root), { s: ms, r: (1 - ms) * -25 });
     const m = $("#fm", root);
-    tf($(".m-sun", m), { y: (1 - E.outBack(prog(t, 4.4, 5.0), 2.2)) * 26 });
-    tf($(".m-rays", m), { r: t * 30, s: ease(t, 4.6, 5.2, E.outBack) });
-    $(".m-reveal", m).setAttribute("width", (64 * ease(t, 4.45, 5.0, E.inOutCubic)).toFixed(2));
-    draw($(".m-wave", m), ease(t, 4.6, 5.2, E.inOutCubic));
+    markAnim(m, t, 4.2);
     rise($("#f-word", root), t, 4.5, { stagger: 0.04, dur: 0.8, dist: 220 });
     rise($("#f-tag", root), t, 5.3, { stagger: 0.06 });
     const ck = spring(t - 6.0, 10, 7);

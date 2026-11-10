@@ -410,3 +410,115 @@ scene({
     tf($("#k-all", root), { s: 1 - out * 0.08, o: 1 - out });
   },
 });
+
+// ---------- 8. Reuse it: the Workshop ----------
+const WS = {
+  en: { tab: "Workshop", sub: "Turn beach trash into something useful.", title: "Self-watering bottle planter", easy: "Easy", min: "30 min", type: "Bottles", need: "You'll need", steps: "Steps", safety: "Safety first",
+    mats: ["1 plastic bottle (1.5 liter is good)", "Scissors or a small knife", "A piece of old cloth or a thick string"],
+    st: ["Wash the bottle inside and out. Take off the label.", "Ask an adult to cut the bottle in half. Keep the bottom part and the top part with the neck.", "Ask an adult to make a small hole in the cap. Push the cloth or string through it."],
+    safe: "Ask an adult to cut the bottle." },
+};
+const WCARDS = [["🪴", "Self-watering bottle planter", "Turn a plastic bottle into a small pot that waters the plant by itself.", "Easy", "good", "30 min"],
+  ["🧹", "Bottle broom", "Cut plastic bottles into strips to make a strong, free broom.", "Medium", "amber", "40 min"],
+  ["🎨", "Bottle cap mosaic", "Use colorful bottle caps to make a picture for a wall or a table.", "Medium", "amber", "90 min"]];
+const WPH = { x: 1190, y: 125 };
+scene({
+  name: "workshop", t0: S.workshop, t1: S.game,
+  build(root) {
+    const r = rng(11);
+    const float = ["🧱", "🪴", "🧹", "🛍️", "🌿", "🪵", "🎨", "🩴", "👜", "♻️", "🍂"].map((e, i) => ({ e, x: 80 + r() * 1000, y: 120 + r() * 860, s: 0.6 + r() * 0.8, ph: r() * 6 }));
+    root.innerHTML = `
+      <div class="abs" style="inset:0;background:var(--sand)"></div>
+      <div class="abs" style="left:1010px;top:90px;width:760px;height:900px;border-radius:50%;background:radial-gradient(closest-side,#ede9fe,rgba(237,233,254,0))"></div>
+      <div id="w-float">${float.map((f) => `<div class="abs wf" style="font-size:${(56 * f.s).toFixed(0)}px;opacity:.13">${f.e}</div>`).join("")}</div>
+      ${phoneHTML("w-phone")}
+      <div class="caps" id="w-caps" style="left:110px;width:960px">
+        <div class="eyebrow" style="color:#7c3aed">Step 04 · New</div>
+        <div class="h1 cap-t" style="font-size:136px;margin-top:18px">Reuse it.</div>
+        <div class="bullets">
+          <div class="bl"><div class="n">1</div><div>Tap <span style="color:var(--teal)">“I want to reuse”</span> while you report.</div></div>
+          <div class="bl"><div class="n">2</div><div>The Workshop opens on that trash type.<small>11 step-by-step guides: eco-bricks, planters, net bags, mosaics…</small></div></div>
+          <div class="bl"><div class="n">3</div><div>What you need, the steps, and a safety tip.<small>Like: “Ask an adult to cut the bottle.”</small></div></div>
+        </div>
+      </div>`;
+    root.__f = float.map((f, i) => ({ ...f, el: $$(".wf", root)[i] }));
+    const scr = $(".screen", root);
+    const L = WS.en;
+    scr.insertAdjacentHTML("beforeend", `
+      <div class="scr" id="w-rep" style="background:var(--sand)">
+        <div class="abs" style="left:22px;right:22px;top:62px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:1000;font-size:26px">New report</span><span style="font-weight:900;font-size:22px;color:var(--muted-ink)">✕</span></div>
+        <div class="abs" style="left:18px;right:18px;top:108px;height:230px;border-radius:22px;overflow:hidden">${beachPhoto(true, "wr")}</div>
+        <div class="abs" style="left:18px;right:18px;top:356px;display:flex;gap:8px;flex-wrap:wrap"><span class="chip on">🧴 Bottles</span><span class="chip">🛍️ Plastic</span><span class="chip">🕸️ Nets</span></div>
+        <div class="abs" style="left:18px;right:18px;top:420px;display:flex;gap:10px;align-items:center">
+          <span class="chip coral" style="height:44px;font-size:16px">+40 pts</span>
+          <div id="w-reuse" style="flex:1;height:50px;border-radius:18px;background:var(--teal-soft);border:2px solid #b6e3e1;color:var(--teal-ink);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:1000;font-size:17px">♻️ I want to reuse</div>
+        </div>
+        <div class="abs btn" style="left:18px;right:18px;top:676px">Submit report</div>
+      </div>
+      <div class="scr" id="w-list" style="background:var(--sand)">
+        <div class="abs" style="left:20px;right:20px;top:64px">
+          <div style="font-weight:1000;font-size:34px;letter-spacing:-0.02em">${L.tab}</div>
+          <div style="font-weight:800;font-size:15px;color:var(--muted-ink)">${L.sub}</div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:14px"><span class="chip">All</span><span class="chip">Plastic</span><span class="chip on" id="w-chip">Bottles</span><span class="chip">Nets</span><span class="chip">Organic</span></div>
+          <div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
+            ${WCARDS.map(([e, ti, b, d, dc, m]) => `<div class="card wc" style="display:flex;gap:12px;padding:13px;border-radius:20px;align-items:center">
+              <div style="flex:none;width:58px;height:58px;border-radius:18px;background:var(--teal-soft);display:grid;place-items:center;font-size:32px">${e}</div>
+              <div style="flex:1;min-width:0"><div style="font-weight:1000;font-size:16px;line-height:1.15">${ti}</div><div style="font-weight:700;font-size:12.5px;color:var(--muted-ink);margin-top:3px;line-height:1.3">${b}</div>
+                <div style="display:flex;gap:6px;margin-top:7px;align-items:center"><span class="chip ${dc}" style="height:22px;font-size:11px;padding:0 8px">${d}</span><span style="font-weight:800;font-size:12px;color:var(--muted-ink)">⏱ ${m}</span><span class="chip" style="height:22px;font-size:11px;padding:0 8px;background:var(--muted);border:none">Bottles</span></div></div>
+              <div style="color:#b8ab8e;font-weight:900">›</div></div>`).join("")}
+          </div>
+        </div>
+        ${tabbar().replace('class="tab on"', 'class="tab"').replace('<div class="tab"><span>🔨</span>', '<div class="tab on"><span>🔨</span>')}
+      </div>
+      <div class="scr" id="w-det" style="background:var(--sand)">
+        <div class="abs" style="left:18px;right:18px;top:60px;display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:8px;font-weight:900;font-size:15px;color:var(--teal-ink)"><span style="width:36px;height:36px;border-radius:50%;background:var(--muted);display:grid;place-items:center;color:var(--ink)">←</span>Back</span>
+</div>
+        <div class="abs" style="left:18px;right:18px;top:110px;display:flex;gap:14px;align-items:center">
+          <div id="w-emo" style="flex:none;width:72px;height:72px;border-radius:24px;background:var(--teal-soft);display:grid;place-items:center;font-size:42px">🪴</div>
+          <div style="min-width:0"><div class="wl" data-k="title" style="font-weight:1000;font-size:21px;line-height:1.15"></div>
+            <div style="display:flex;gap:6px;margin-top:7px;align-items:center"><span class="chip good wl" data-k="easy" style="height:22px;font-size:11px;padding:0 8px"></span><span class="wl" data-k="min" style="font-weight:800;font-size:12px;color:var(--muted-ink)"></span><span class="chip wl" data-k="type" style="height:22px;font-size:11px;padding:0 8px;background:var(--muted);border:none"></span></div></div></div>
+        <div class="abs card" style="left:18px;right:18px;top:204px;padding:12px 14px;border-radius:18px">
+          <div class="wl" data-k="need" style="font-weight:1000;font-size:14px"></div>
+          ${[0, 1, 2].map((i) => `<div style="display:flex;gap:8px;font-weight:700;font-size:13px;margin-top:6px"><span style="color:var(--teal)">•</span><span class="wl" data-k="mats" data-i="${i}"></span></div>`).join("")}
+        </div>
+        <div class="abs" style="left:18px;right:18px;top:350px">
+          <div class="wl" data-k="steps" style="font-weight:1000;font-size:14px"></div>
+          ${[0, 1, 2].map((i) => `<div class="wst" style="display:flex;gap:10px;margin-top:10px;align-items:flex-start"><span style="flex:none;width:28px;height:28px;border-radius:10px;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:1000;font-size:14px">${i + 1}</span><span class="wl" data-k="st" data-i="${i}" style="font-weight:700;font-size:13.5px;line-height:1.35"></span></div>`).join("")}
+        </div>
+        <div class="abs" id="w-safe" style="left:18px;right:18px;top:530px;padding:12px 14px;border-radius:18px;background:var(--amber-soft);border:2px solid #fcd98a">
+          <div class="wl" data-k="safety" style="font-weight:1000;font-size:14px;color:var(--amber-ink)"></div>
+          <div class="wl" data-k="safe" style="font-weight:700;font-size:13px;margin-top:4px"></div></div>
+      </div>
+      ${tapHTML("w-tap1")}${tapHTML("w-tap2")}`);
+    $("#w-tap1", root).style.cssText += `left:${SW / 2 + 70}px;top:445px`;
+    $("#w-tap2", root).style.cssText += `left:${SW / 2 + 30}px;top:225px`;
+    split($(".cap-t", root));
+  },
+  update(t, root) {
+    const ph = $("#w-phone", root), k = spring(t - 0.1, 7, 6), out = ease(t, 9.0, 9.6, E.inBack);
+    tf(ph, { x: WPH.x + out * 900, y: WPH.y + (1 - k) * 900, r: (1 - k) * 10 + out * 8 });
+    root.__f.forEach((f) => tf(f.el, { x: f.x + Math.sin(t * 0.5 + f.ph) * 30, y: f.y + Math.cos(t * 0.4 + f.ph) * 24 - t * 8, r: Math.sin(t + f.ph) * 15, o: 0.1 * ease(t, 0.2, 1.2) * (1 - ease(t, 9.0, 9.5)) }));
+    const caps = $("#w-caps", root);
+    tf($(".eyebrow", caps), { y: (1 - ease(t, 0.3, 0.8)) * 30, o: ease(t, 0.3, 0.8) * (1 - ease(t, 9.0, 9.4)) });
+    rise($(".cap-t", caps), t, 0.35, { out: 9.0, dist: 160 });
+    bulletsAt(caps, t, [0.9, 2.4, 5.6], 9.0);
+    // screens
+    tapAt($("#w-tap1", root), t, 1.4);
+    tf($("#w-reuse", root), { s: 1 - 0.06 * Math.sin(Math.PI * prog(t, 1.32, 1.55)) });
+    const li = ease(t, 1.6, 2.05, E.outQuint), de = ease(t, 5.0, 5.45, E.outQuint);
+    tf($("#w-rep", root), { x: -li * 120, o: 1 - li });
+    tf($("#w-list", root), { x: (1 - li) * SW - de * 120, o: t > 1.6 ? 1 - de : 0 });
+    tf($("#w-det", root), { x: (1 - de) * SW, o: t > 5.0 ? 1 : 0 });
+    $$(".wc", root).forEach((c, i) => { const a = 2.4 + i * 0.2, kk = spring(t - a, 12, 8); tf(c, { y: (1 - kk) * 50, o: t > a ? 1 : 0, s: i === 0 ? 1 - 0.04 * Math.sin(Math.PI * prog(t, 4.72, 4.95)) : 1 }); });
+    tf($("#w-chip", root), { s: 1 + 0.12 * Math.sin(Math.PI * prog(t, 3.4, 3.7)) });
+    tapAt($("#w-tap2", root), t, 4.8);
+    $$(".wst", root).forEach((s, i) => { const a = 5.8 + i * 0.3, kk = spring(t - a, 12, 8); tf(s, { x: (1 - kk) * 40, o: t > a ? 1 : 0 }); });
+    tf($("#w-safe", root), { y: (1 - spring(t - 6.8, 12, 8)) * 30, o: t > 6.8 ? 1 : 0 });
+    tf($("#w-emo", root), { s: 1 + 0.08 * Math.sin(t * 3), r: Math.sin(t * 2) * 4 });
+    if (!root.__filled) {
+      root.__filled = true;
+      $$(".wl", root).forEach((el) => { const v = WS.en[el.dataset.k]; el.textContent = el.dataset.i !== undefined ? v[+el.dataset.i] : v; });
+    }
+  },
+});
