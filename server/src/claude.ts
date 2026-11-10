@@ -20,16 +20,19 @@ async function ask(content: unknown[]): Promise<Record<string, unknown> | null> 
       method: "POST",
       signal: ctrl.signal,
       headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: process.env.MODEL || "claude-sonnet-5-5", max_tokens: 300, messages: [{ role: "user", content }] }),
+      body: JSON.stringify({ model: process.env.MODEL || "claude-sonnet-5-5", max_tokens: 2000, output_config: { effort: "low" }, messages: [{ role: "user", content }] }),
     });
-    if (!res.ok) return null;
+    // Anthropic could not read the image: that is the photo's fault, not an outage, so it must not pass as "unverified"
+    if (res.status === 400) { console.error("claude 400:", (await res.text()).slice(0, 300)); return { clean_score: 0, reason: "Photo could not be read" }; }
+    if (!res.ok) { console.error("claude", res.status, (await res.text()).slice(0, 300)); return null; }
     const body = (await res.json()) as { content?: { type: string; text?: string }[] };
     const text = (body.content ?? []).filter((b) => b.type === "text").map((b) => b.text ?? "").join("\n");
     const m = text.match(/\{[\s\S]*?\}/);
-    if (!m) return null;
+    if (!m) { console.error("claude: no JSON in reply, stop_reason", (body as { stop_reason?: string }).stop_reason); return null; }
     const obj = JSON.parse(m[0]);
     return obj && typeof obj === "object" ? obj : null;
-  } catch {
+  } catch (e) {
+    console.error("claude call failed:", e instanceof Error ? e.message : e);
     return null;
   } finally {
     clearTimeout(timer);

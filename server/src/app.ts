@@ -65,7 +65,7 @@ function decodePhoto(v: unknown): { b64: string; buf: Buffer } {
   const b64 = v.replace(/^data:[^;,]*;base64,/, "").replace(/\s+/g, "");
   if (!/^[A-Za-z0-9+/_-]+=*$/.test(b64)) throw new HttpError(400, "Photo is not valid base64");
   const buf = Buffer.from(b64, "base64");
-  if (buf.length < 4) throw new HttpError(400, "Photo missing");
+  if (buf.length < 4 || buf[0] !== 0xff || buf[1] !== 0xd8 || buf[2] !== 0xff) throw new HttpError(400, "Photo must be a JPEG");
   return { b64, buf };
 }
 
@@ -84,6 +84,15 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
     if (!p) throw new HttpError(401, "Join first");
     return p;
   };
+  // Per-address caps so one visitor cannot flood the shared demo (generous: judges may share one Wi-Fi address).
+  const hits = new Map<string, number[]>();
+  const limit = (key: string, max: number) => {
+    const now = Date.now();
+    const l = (hits.get(key) ?? []).filter((t) => now - t < HOUR);
+    if (l.length >= max) { hits.set(key, l); throw new HttpError(429, "Slow down a little"); }
+    l.push(now); hits.set(key, l);
+  };
+  const ip = (req: IncomingMessage) => String(req.headers["x-real-ip"] ?? req.socket.remoteAddress ?? "?");
   const useAi = (token: string) => {
     const now = Date.now();
     const list = (aiCalls.get(token) ?? []).filter((t) => now - t < HOUR);
@@ -130,6 +139,7 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
       if (avatar.length > 16) throw new HttpError(400, "Avatar too long");
       if (!avatar) avatar = "🐢";
       const p: StoredPlayer = { id: newId(), nickname, avatar, createdAt: new Date().toISOString(), token: crypto.randomBytes(24).toString("base64url") };
+      limit("p:" + ip(req), 60);
       store.db.players.push(p); store.save();
       return json(res, 200, { player: publicPlayer(p), token: p.token });
     }
@@ -139,7 +149,7 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
     if (route === "ai/tag") {
       const body = (await readBody(req)) as { photo?: unknown };
       const { b64 } = decodePhoto(body.photo);
-      useAi(player.token);
+      limit("a:" + ip(req), 240); useAi(player.token);
       const t = await tagPhoto(b64);
       return json(res, 200, t ? { ...t, ai: true } : { isTrash: true, type: "mixed", size: "M", summary: "", ai: false });
     }
@@ -163,6 +173,7 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
         id, beachId: snap.beachId, lng: snap.lng, lat: snap.lat, type: body.type as TrashType, size,
         ...(note ? { note } : {}), photo, by: player.id, createdAt: new Date().toISOString(), status: "open", points: reportPoints(size),
       };
+      limit("r:" + ip(req), 120);
       store.db.reports.push(report); store.save();
       const after = badges(store.db.reports, player.id);
       return json(res, 200, { report, points: report.points, newBadges: after.filter((b) => !before.includes(b)) });
@@ -176,7 +187,7 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
       if (!report) throw new HttpError(404, "Report not found");
       if (report.status !== "open" || cleaning.has(id)) throw new HttpError(409, "Already cleaned");
       const { b64, buf } = decodePhoto(body.photo);
-      useAi(player.token);
+      limit("a:" + ip(req), 240); useAi(player.token);
       cleaning.add(id);
       try {
         let beforeB64: string | null = null;

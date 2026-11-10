@@ -14,9 +14,12 @@ export function useGame(): Game {
     if (busy.current) return;
     busy.current = true;
     try {
+      const sent = getToken();
       const s = await api.state();
-      // a token the server no longer knows (data reset): back to onboarding
-      if (getToken() && !s.me) { setToken(null); setJoined(false); }
+      // a token the server no longer knows (data reset): back to onboarding. Only when that same token was sent:
+      // a poll that started before joining carries no token and must not log the new player out.
+      if (sent && sent === getToken() && !s.me) { setToken(null); setJoined(false); }
+      if (sent !== getToken()) return;
       setState(s); setError(null);
     } catch (e) { setError(e instanceof ApiError ? e.message : "Can't reach the server"); }
     finally { busy.current = false; }
@@ -24,7 +27,7 @@ export function useGame(): Game {
   useEffect(() => { refresh(); const t = setInterval(refresh, 5000); return () => clearInterval(t); }, [refresh]);
   const join = useCallback(async (nickname: string, avatar: string) => {
     const { token } = await api.join(nickname, avatar);
-    setToken(token); setJoined(true); await refresh();
+    setToken(token); setJoined(true); busy.current = false; await refresh();
   }, [refresh]);
   return { state, error, refresh, joined, join };
 }
