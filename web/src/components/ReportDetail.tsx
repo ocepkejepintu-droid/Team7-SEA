@@ -9,6 +9,8 @@ import type { Game } from "@/lib/useGame";
 import { cn } from "@/lib/utils";
 import { BottomSheet, PhotoButtons, SIZE_LABEL, TYPE_LABEL, errText } from "./ReportSheet";
 import { showPoints } from "./PointsToast";
+import { ShareButton } from "./ShareButton";
+import type { ShareTarget } from "@/App";
 
 export function ago(iso: string, now = Date.now()) {
   const s = Math.max(0, (now - new Date(iso).getTime()) / 1000);
@@ -23,7 +25,7 @@ const Pill = ({ className, children }: { className?: string; children: React.Rea
   <span className={cn("inline-flex h-7 items-center rounded-full px-3 text-xs font-extrabold", className)}>{children}</span>
 );
 
-export function ReportDetail({ report, game, onClose }: { report: Report; game: Game; onClose: () => void }) {
+export function ReportDetail({ report, game, onClose, onShare }: { report: Report; game: Game; onClose: () => void; onShare: (t: ShareTarget) => void }) {
   const [phase, setPhase] = useState<"view" | "photo" | "checking" | "result">("view");
   const [after, setAfter] = useState<string | null>(null);
   const [result, setResult] = useState<CleanResult | null>(null);
@@ -120,6 +122,10 @@ export function ReportDetail({ report, game, onClose }: { report: Report; game: 
             <p className="mt-1 text-xs opacity-80">A score of {CLEAN_PASS} or more counts as clean.</p>
           </div>
         )
+      )}
+
+      {shown.status === "cleaned" && shown.clean && (
+        <ShareButton className="mt-3" label="Share before / after" onClick={() => onShare({ kind: "cleanup", reportId: report.id })} />
       )}
 
       {error && <p className="mt-3 rounded-xl bg-coral-soft px-3 py-2 text-sm font-semibold text-coral-ink">{error}</p>}

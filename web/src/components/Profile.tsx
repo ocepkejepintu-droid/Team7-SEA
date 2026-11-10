@@ -4,8 +4,10 @@ import type { Game } from "@/lib/useGame";
 import { SIZE_LABEL, TRASH_LABEL, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Bone, Empty } from "./League";
+import { ShareButton } from "./ShareButton";
+import type { ShareTarget } from "@/App";
 
-export function Profile({ game, onOpenReport }: { game: Game; onOpenReport: (reportId: string) => void }) {
+export function Profile({ game, onOpenReport, onShare }: { game: Game; onOpenReport: (reportId: string) => void; onShare: (t: ShareTarget) => void }) {
   const s = game.state;
   const wrap = "mx-auto max-w-md px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-8";
   if (!s?.me) {
@@ -33,6 +35,7 @@ export function Profile({ game, onOpenReport }: { game: Game; onOpenReport: (rep
           <Stat value={mine.length} label="reports made" />
           <Stat value={cleaned} label="spots cleaned" />
         </div>
+        <ShareButton className="mt-3" label="Share my card" onClick={() => onShare({ kind: "player" })} />
       </section>
 
       <h2 className="mt-7 flex items-baseline justify-between text-xl font-extrabold">
