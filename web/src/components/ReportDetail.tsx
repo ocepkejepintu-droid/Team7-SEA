@@ -10,6 +10,8 @@ import { sizeLabel, timeAgo, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { BottomSheet, PhotoButtons, errText, typeLabel } from "./ReportSheet";
 import { showPoints } from "./PointsToast";
+import { ShareButton } from "./ShareButton";
+import type { ShareTarget } from "@/App";
 
 /** Renders a translated sentence whose "\u0000" marker stands for a name, with the name in bold (word order differs per language). */
 function parts(sentence: string, name: string, bold?: string) {
@@ -21,7 +23,7 @@ const Pill = ({ className, children }: { className?: string; children: React.Rea
   <span className={cn("inline-flex h-7 items-center rounded-full px-3 text-xs font-extrabold", className)}>{children}</span>
 );
 
-export function ReportDetail({ report, game, onClose }: { report: Report; game: Game; onClose: () => void }) {
+export function ReportDetail({ report, game, onClose, onShare }: { report: Report; game: Game; onClose: () => void; onShare: (t: ShareTarget) => void }) {
   const { t, lang } = useI18n();
   const [phase, setPhase] = useState<"view" | "photo" | "checking" | "result">("view");
   const [after, setAfter] = useState<string | null>(null);
@@ -119,6 +121,10 @@ export function ReportDetail({ report, game, onClose }: { report: Report; game: 
             <p className="mt-1 text-xs opacity-80">{t("detail.passNote", { pass: CLEAN_PASS })}</p>
           </div>
         )
+      )}
+
+      {shown.status === "cleaned" && shown.clean && (
+        <ShareButton className="mt-3" label="Share before / after" onClick={() => onShare({ kind: "cleanup", reportId: report.id })} />
       )}
 
       {error && <p className="mt-3 rounded-xl bg-coral-soft px-3 py-2 text-sm font-semibold text-coral-ink">{error}</p>}

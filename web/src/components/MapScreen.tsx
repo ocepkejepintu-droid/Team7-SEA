@@ -9,6 +9,7 @@ import { GameMap, type GameMapHandle } from "./GameMap";
 import { ChallengeBanner } from "./ChallengeBanner";
 import { ReportSheet, type Picked } from "./ReportSheet";
 import { ReportDetail } from "./ReportDetail";
+import type { ShareTarget } from "@/App";
 import { PointsToast, showPoints } from "./PointsToast";
 
 export interface MapFocus { beachId?: string; reportId?: string; n: number }
@@ -19,7 +20,7 @@ const snap = (lng: number, lat: number): Picked => {
 };
 
 /** The Map tab: map, report button, report sheet and report detail. */
-export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
+export function MapScreen({ game, focus, onShare }: { game: Game; focus?: MapFocus; onShare: (t: ShareTarget) => void }) {
   const map = useRef<GameMapHandle>(null);
   const { t } = useI18n();
   const reports = useMemo(() => game.state?.reports ?? [], [game.state]);
@@ -92,7 +93,7 @@ export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
       {reporting && (
         <ReportSheet onClose={closeReport} pick={pick} onPickStart={startPick} onPickEnd={endPick} onSubmitted={onSubmitted} />
       )}
-      {selected && !reporting && <ReportDetail key={selected.id} report={selected} game={game} onClose={() => setSelectedId(null)} />}
+      {selected && !reporting && <ReportDetail key={selected.id} report={selected} game={game} onClose={() => setSelectedId(null)} onShare={onShare} />}
       <PointsToast />
     </div>
   );
