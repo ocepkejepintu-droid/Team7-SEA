@@ -4,9 +4,11 @@ import type { Game } from "@/lib/useGame";
 import { badgeHow, badgeName, sizeLabel, timeAgo, trashLabel, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Bone, Empty } from "./League";
+import { ShareButton } from "./ShareButton";
+import type { ShareTarget } from "@/App";
 import { Settings } from "./Settings";
 
-export function Profile({ game, onOpenReport }: { game: Game; onOpenReport: (reportId: string) => void }) {
+export function Profile({ game, onOpenReport, onShare }: { game: Game; onOpenReport: (reportId: string) => void; onShare: (t: ShareTarget) => void }) {
   const s = game.state;
   const { t, num } = useI18n();
   const wrap = "mx-auto max-w-md px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-8";
@@ -35,6 +37,7 @@ export function Profile({ game, onOpenReport }: { game: Game; onOpenReport: (rep
           <Stat value={mine.length} label={t("me.reportsMade")} />
           <Stat value={cleaned} label={t("me.spotsCleaned")} />
         </div>
+        <ShareButton className="mt-3" label="Share my card" onClick={() => onShare({ kind: "player" })} />
       </section>
 
       <Settings />

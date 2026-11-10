@@ -5,10 +5,12 @@ import type { Game } from "@/lib/useGame";
 import { healthBg, healthText } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { ShareButton } from "./ShareButton";
+import type { ShareTarget } from "@/App";
 
 type View = "beaches" | "players";
 
-export function League({ game, onOpenBeach }: { game: Game; onOpenBeach: (beachId: string) => void }) {
+export function League({ game, onOpenBeach, onShare }: { game: Game; onOpenBeach: (beachId: string) => void; onShare: (t: ShareTarget) => void }) {
   const [view, setView] = useState<View>("beaches");
   const s = game.state;
   const { t } = useI18n();
@@ -34,7 +36,7 @@ export function League({ game, onOpenBeach }: { game: Game; onOpenBeach: (beachI
         ))}
       </div>
 
-      {!s ? <ListSkeleton /> : view === "beaches" ? <Beaches league={s.league} onOpen={onOpenBeach} /> : <Players players={s.players} meId={s.me?.player.id} />}
+      {!s ? <ListSkeleton /> : view === "beaches" ? <Beaches league={s.league} onOpen={onOpenBeach} onShare={(beachId) => onShare({ kind: "beach", beachId })} /> : <Players players={s.players} meId={s.me?.player.id} />}
     </div>
   );
 }
@@ -65,7 +67,7 @@ function HealthBar({ health, className }: { health: number; className?: string }
   );
 }
 
-function Beaches({ league, onOpen }: { league: BeachStanding[]; onOpen: (id: string) => void }) {
+function Beaches({ league, onOpen, onShare }: { league: BeachStanding[]; onOpen: (id: string) => void; onShare: (id: string) => void }) {
   const { t } = useI18n();
   const ranked = league.filter((b) => b.rank !== null).sort((a, b) => a.rank! - b.rank!);
   const unranked = league.length - ranked.length;
@@ -91,6 +93,7 @@ function Beaches({ league, onOpen }: { league: BeachStanding[]; onOpen: (id: str
         <HealthBar health={winner.health} className="mt-4 h-3" />
         <p className="mt-2 text-sm font-semibold text-muted-foreground">{t("league.winnerLine", { open: winner.open, cleaned: winner.cleanedThisWeek })}</p>
       </button>
+      <ShareButton className="mt-2" label="Share the winner" onClick={() => onShare(winner.beachId)} />
 
       {rest.length > 0 && (
         <ol className="mt-3 overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border">
