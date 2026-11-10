@@ -2,7 +2,7 @@
 
 A phone-first web app for the Bali coast. People report trash with a photo and a pin, anyone can clean it up and post an after photo, and beaches compete: the beach with the fewest open reports wins the week. Players earn personal points and badges.
 
-Hackathon demo, built 10 Nov 2026. Design: [`docs/superpowers/specs/2026-11-10-pantai-league-design.md`](docs/superpowers/specs/2026-11-10-pantai-league-design.md).
+Hackathon demo, built 10 Nov 2026. Launch film: [`video/out/hai-pantai-launch.mp4`](video/out/hai-pantai-launch.mp4) ([how it's made](video/README.md)). Design: [`docs/superpowers/specs/2026-11-10-pantai-league-design.md`](docs/superpowers/specs/2026-11-10-pantai-league-design.md).
 
 ## How it works
 
