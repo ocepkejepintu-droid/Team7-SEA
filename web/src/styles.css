@@ -1,0 +1,87 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Pantai League: ocean teal, sand and coral. Rounded and playful. Light only. */
+:root {
+  --radius: 1rem;
+  --background: #ffffff;
+  --foreground: #12343b;
+  --card: #ffffff;
+  --card-foreground: #12343b;
+  --popover: #ffffff;
+  --popover-foreground: #12343b;
+  --primary: #0e9f9a;
+  --primary-foreground: #ffffff;
+  --secondary: #e6f5f4;
+  --secondary-foreground: #0b6b68;
+  --muted: #f3ecdd;
+  --muted-foreground: #5d7377;
+  --accent: #e6f5f4;
+  --accent-foreground: #0b6b68;
+  --destructive: #ff6b4a;
+  --border: #eadfc8;
+  --input: #eadfc8;
+  --ring: #0e9f9a;
+  --canvas: #fbf6ec;
+  --brand: #0e9f9a;
+  --brand-ink: #0b6b68;
+  --brand-soft: #e6f5f4;
+  --coral: #ff6b4a;
+  --coral-soft: #ffe7e1;
+  --coral-ink: #b83a1e;
+  --good: #22c55e;
+  --good-soft: #dcfce7;
+  --good-ink: #15803d;
+  --amber: #f59e0b;
+  --amber-soft: #fef3c7;
+  --amber-ink: #92400e;
+  --sea: #cfe9ea;
+  color-scheme: light;
+}
+
+@theme inline {
+  --font-sans: "Nunito Variable", ui-rounded, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-canvas: var(--canvas);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-coral: var(--coral);
+  --color-coral-soft: var(--coral-soft);
+  --color-coral-ink: var(--coral-ink);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-good-ink: var(--good-ink);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-amber-ink: var(--amber-ink);
+  --color-sea: var(--sea);
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  html, body, #root { height: 100%; }
+  html { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-canvas text-foreground; overscroll-behavior: none; }
+}
