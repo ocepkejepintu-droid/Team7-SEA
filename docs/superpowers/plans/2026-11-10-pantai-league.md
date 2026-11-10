@@ -1,4 +1,4 @@
-# Pantai League Implementation Plan
+# Hai Pantai Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -42,7 +42,7 @@
 - Create: `.gitignore` (`node_modules`, `dist`, `server/data`, `.env`)
 
 - [ ] **Step 1:** Copy the files and install: `npm install`. Expected: no errors.
-- [ ] **Step 2:** `web/src/App.tsx` renders "Pantai League". Run `npm run build -w web`. Expected: `web/dist/index.html` exists.
+- [ ] **Step 2:** `web/src/App.tsx` renders "Hai Pantai". Run `npm run build -w web`. Expected: `web/dist/index.html` exists.
 - [ ] **Step 3:** Commit `chore: scaffold pantai league workspaces`.
 
 ### Task 2: Coast data and beach lookup
