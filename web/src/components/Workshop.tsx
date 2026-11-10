@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronRight, Clock, ShieldAlert } from "lucide-react";
 import { TRASH_TYPES, type TrashType } from "@shared/types";
 import { GUIDES, guideById, guidesFor, type Difficulty, type Guide } from "@shared/workshop";
 import { trashLabel, useI18n, type Key } from "@/lib/i18n";
+import { localGuide } from "@/lib/workshopI18n";
 import { cn } from "@/lib/utils";
 import { Chip, typeLabel } from "./ReportSheet";
 import { Empty } from "./League";
@@ -31,7 +32,7 @@ function Minutes({ n }: { n: number }) {
 }
 
 export function Workshop({ focus }: { focus: WorkshopFocus }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [type, setType] = useState<TrashType | null>(focus.type);
   const [openId, setOpenId] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -76,8 +77,9 @@ export function Workshop({ focus }: { focus: WorkshopFocus }) {
     return type && !withGuides.includes(type) ? [...withGuides, type] : withGuides;
   }, [type]);
 
-  const guides = guidesFor(type);
-  const guide = openId ? guideById(openId) : undefined;
+  const guides = guidesFor(type).map((g) => localGuide(lang, g));
+  const found = openId ? guideById(openId) : undefined;
+  const guide = found && localGuide(lang, found);
 
   const open = (g: Guide) => {
     listScroll.current = scroller()?.scrollTop ?? 0;
