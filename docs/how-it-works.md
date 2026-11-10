@@ -25,6 +25,7 @@ flowchart LR
    - **Pin.** The pin starts at the player's GPS position (only on HTTPS or localhost) or the map centre, and the player can move it. The pin always snaps to the nearest point on the coast, which decides which beach the report belongs to.
 4. **Clean a spot.** Tapping a report opens its detail. **I cleaned this** asks for an after photo. Claude compares it with the original photo and returns a clean score from 0 to 100 and a short reason.
 5. **Compete.** The **League** tab ranks the beaches and lists the top 20 players. The **Me** tab shows the player's points, badges and reports, plus language and theme settings.
+6. **Share.** A player can post a story card to Instagram: a before/after card from a cleaned report, a player trading card from the Me tab, or a beach health poster from the league winner. See [Share cards](#share-cards).
 
 ## 2. The game rules
 
@@ -107,7 +108,12 @@ The app keeps working without Claude. With no `ANTHROPIC_API_KEY`, or when the c
 - `web/src/lib/useGame.ts` fetches `api/state` every 5 seconds. That poll is how players see each other's reports and cleanups: there are no websockets. If the server no longer knows the token (for example, after a data reset), the player goes back to the welcome screen.
 - `web/src/components/GameMap.tsx` draws the map with MapLibre: land from `web/public/land.json`, coastlines coloured by health, and report dots, all as GeoJSON layers that update when new state arrives.
 - `ReportSheet.tsx` is the three-step report flow; `ReportDetail.tsx` shows a report and runs the cleanup; `PointsToast.tsx` celebrates points and new badges.
+- `ShareSheet.tsx`, `web/src/lib/share.ts` and `web/src/lib/shareCard.ts` make the share cards (below).
 - `web/src/lib/i18n.ts` holds all interface text in English, 简体中文 and Bahasa Indonesia. `web/src/lib/theme.ts` switches light and dark. Both start from the browser's settings and remember the player's choice.
+
+### Share cards
+
+The share cards are made entirely in the browser; the server is not involved. `share.ts` picks the data for a card from the game state the app already has (a cleaned report, the player's points and badges, or a beach's standing). `shareCard.ts` draws it on a canvas as a 1080 × 1920 PNG, the size of an Instagram story. The app then opens the phone's share sheet, where Instagram is one of the targets, or downloads the PNG where the browser cannot share files. The beach poster changes colour and headline with the beach's standing: gold for first place, coral "needs help" when health is under 50. Examples are in [`docs/share-cards/`](share-cards/README.md).
 
 ## 4. One report, end to end
 
