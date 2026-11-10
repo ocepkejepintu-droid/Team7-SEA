@@ -26,6 +26,7 @@ flowchart LR
 4. **Clean a spot.** Tapping a report opens its detail. **I cleaned this** asks for an after photo. Claude compares it with the original photo and returns a clean score from 0 to 100 and a short reason.
 5. **Compete.** The **League** tab ranks the beaches and lists the top 20 players. The **Me** tab shows the player's points, badges and reports, plus language and theme settings.
 6. **Share.** A player can post a story card to Instagram: a before/after card from a cleaned report, a player trading card from the Me tab, or a beach health poster from the league winner. See [Share cards](#share-cards).
+7. **Reuse.** The **Workshop** tab has 11 step-by-step guides for turning beach trash into something useful, such as eco-bricks, filterable by trash type. While reporting, the **I want to reuse** button opens the Workshop filtered to the type being reported, and keeps the report in progress.
 
 ## 2. The game rules
 
@@ -63,7 +64,7 @@ flowchart LR
 
 | Part | Where | What it does |
 |---|---|---|
-| Shared rules and types | `shared/` | `types.ts` (reports, players, beaches), `game.ts` (rules above), `coast.ts` + `coast.json` (beaches and coast snapping) |
+| Shared rules and types | `shared/` | `types.ts` (reports, players, beaches), `game.ts` (rules above), `coast.ts` + `coast.json` (beaches and coast snapping), `workshop.ts` (reuse guides) |
 | Server | `server/src/` | A plain Node HTTP server with no runtime libraries. It serves the API, the photos and the built web app |
 | Web app | `web/src/` | React, Tailwind, shadcn components and MapLibre for the map |
 | Deploy | `deploy/`, `scripts/release.sh` | A systemd service and an nginx snippet that publish the app at `/pantai/` |
@@ -104,10 +105,11 @@ The app keeps working without Claude. With no `ANTHROPIC_API_KEY`, or when the c
 
 ### The web app
 
-- `web/src/App.tsx` shows the welcome screen until the player has joined, then three tabs: Map, League and Me. The map stays mounted while other tabs are open, so it does not reload.
+- `web/src/App.tsx` shows the welcome screen until the player has joined, then four tabs: Map, League, Workshop and Me. The map stays mounted while other tabs are open, so it does not reload.
 - `web/src/lib/useGame.ts` fetches `api/state` every 5 seconds. That poll is how players see each other's reports and cleanups: there are no websockets. If the server no longer knows the token (for example, after a data reset), the player goes back to the welcome screen.
 - `web/src/components/GameMap.tsx` draws the map with MapLibre: land from `web/public/land.json`, coastlines coloured by health, and report dots, all as GeoJSON layers that update when new state arrives.
 - `ReportSheet.tsx` is the three-step report flow; `ReportDetail.tsx` shows a report and runs the cleanup; `PointsToast.tsx` celebrates points and new badges.
+- `Workshop.tsx` shows the reuse guides. The guides themselves live in `shared/workshop.ts` (English); `web/src/lib/workshop.zh.ts` and `workshop.id.ts` hold the Chinese and Indonesian text, and `workshopI18n.ts` falls back to English when a translation is missing.
 - `ShareSheet.tsx`, `web/src/lib/share.ts` and `web/src/lib/shareCard.ts` make the share cards (below).
 - `web/src/lib/i18n.ts` holds all interface text in English, 简体中文 and Bahasa Indonesia. `web/src/lib/theme.ts` switches light and dark. Both start from the browser's settings and remember the player's choice.
 
