@@ -1,0 +1,38 @@
+/* Pantai League map and sheet styles (hex colours: MapLibre DOM lives outside Tailwind's reach here). */
+.maplibregl-map { font-family: inherit; }
+.maplibregl-ctrl-attrib.maplibregl-compact { margin: 0 0 6px 6px !important; background: rgba(255, 255, 255, 0.85); font-size: 11px; }
+.maplibregl-ctrl-bottom-left { z-index: 1; }
+
+.pantai-popup .maplibregl-popup-content { border-radius: 18px; padding: 12px 14px 12px; box-shadow: 0 8px 28px rgba(18, 52, 59, 0.18); color: #12343b; min-width: 170px; }
+.pantai-popup .maplibregl-popup-close-button { font-size: 20px; width: 32px; height: 32px; right: 2px; top: 2px; color: #5d7377; border-radius: 999px; }
+.pantai-popup .pp-name { font-weight: 800; font-size: 16px; line-height: 1.2; padding-right: 22px; }
+.pantai-popup .pp-kab { color: #5d7377; font-size: 12px; margin-bottom: 8px; }
+.pantai-popup .pp-row { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #5d7377; }
+.pantai-popup .pp-row b { color: #12343b; font-size: 15px; font-weight: 800; }
+.pantai-popup .pp-dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
+.pantai-popup .pp-rank { margin-top: 8px; font-size: 12px; font-weight: 700; color: #0b6b68; background: #e6f5f4; border-radius: 999px; padding: 4px 10px; display: inline-block; }
+
+.pick-pin { display: flex; flex-direction: column; align-items: center; cursor: grab; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25)); }
+.pick-pin:active { cursor: grabbing; }
+.pick-label { background: #12343b; color: #fff; font-weight: 800; font-size: 12px; padding: 4px 10px; border-radius: 999px; margin-bottom: 4px; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+
+.me-dot { width: 18px; height: 18px; border-radius: 999px; background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.2), 0 1px 4px rgba(0, 0, 0, 0.3); }
+
+/* Bottom sheets */
+.sheet-in { animation: sheet-in 260ms cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+@keyframes sheet-in { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Points toast */
+.points-pop { animation: points-pop 2600ms ease forwards; }
+@keyframes points-pop {
+  0% { transform: translateY(16px) scale(0.6); opacity: 0; }
+  12% { transform: translateY(0) scale(1.12); opacity: 1; }
+  20% { transform: scale(1); }
+  85% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: translateY(-12px) scale(0.96); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-in, .points-pop { animation-duration: 1ms; }
+  .points-pop { animation: none; }
+}

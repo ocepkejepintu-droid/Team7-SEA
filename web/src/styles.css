@@ -85,3 +85,8 @@
   html { -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
   body { @apply bg-canvas text-foreground; overscroll-behavior: none; }
 }
+
+/* Onboarding: gentle bob for the hero avatar */
+@keyframes pl-float { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-6px) rotate(3deg); } }
+.pl-float { animation: pl-float 3.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .pl-float { animation: none; } }
