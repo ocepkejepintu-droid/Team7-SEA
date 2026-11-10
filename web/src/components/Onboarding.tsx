@@ -31,9 +31,7 @@ export function Onboarding({ game }: { game: Game }) {
     <div className="min-h-dvh overflow-y-auto bg-canvas">
       <form onSubmit={submit} className="mx-auto flex min-h-dvh max-w-md flex-col px-5 pt-[max(2.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <header className="text-center">
-          <div className="pl-float mx-auto grid size-20 place-items-center rounded-[1.75rem] bg-brand text-5xl shadow-lg shadow-brand/25" aria-hidden>
-            {avatar}
-          </div>
+          <img src="./logo.png" alt="" aria-hidden width={96} height={96} className="pl-float mx-auto size-24 drop-shadow-lg" />
           <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-brand-ink">Hai Pantai</h1>
           <p className="mt-2 text-lg font-semibold text-foreground/80">Spot trash. Clean it. Help your beach win.</p>
         </header>
