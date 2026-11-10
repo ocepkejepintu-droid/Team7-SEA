@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480">
+  <rect width="640" height="200" fill="#c7ecff"/>
+  <circle cx="520" cy="80" r="38" fill="#ffd36e"/>
+  <path d="M0 170 Q160 150 320 170 T640 170 V280 H0 Z" fill="#0e9f9a"/>
+  <path d="M0 250 Q120 235 240 252 T480 248 T640 252 V280 H0 Z" fill="#ffffff" opacity="0.55"/>
+  <path d="M0 262 Q160 240 320 262 T640 258 V480 H0 Z" fill="#f7e6bb"/>
+  <path d="M40 300 q30 -12 60 0" stroke="#e2cfa3" stroke-width="4" fill="none"/>
+  <path d="M420 420 q30 -12 60 0" stroke="#e2cfa3" stroke-width="4" fill="none"/>
+  <g transform="translate(320 360)"><path d="M0 -60 V40" stroke="#8b5a2b" stroke-width="6"/><path d="M0 -60 q-60 0 -80 30 q60 -10 80 -30 q60 0 80 30 q-60 -10 -80 -30" fill="#22c55e"/></g>
+  <circle cx="200" cy="380" r="14" fill="#fca5a5"/><path d="M186 380 q14 -18 28 0" fill="#fb7185"/>
+  <path d="M470 330 l18 -26 l18 26 Z" fill="#22c55e" opacity="0.9"/><path d="M462 380 l10 12 l22 -26" stroke="#16a34a" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <rect x="16" y="436" width="132" height="30" rx="15" fill="#0f172a" opacity="0.72"/>
+  <text x="82" y="456" font-family="Nunito, Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">demo photo</text>
+</svg>

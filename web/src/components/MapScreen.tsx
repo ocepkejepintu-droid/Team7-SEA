@@ -4,6 +4,7 @@ import type { Report } from "@shared/types";
 import { beachById, snapToCoast } from "@shared/coast";
 import type { ReportResult } from "@/lib/api";
 import type { Game } from "@/lib/useGame";
+import { useI18n } from "@/lib/i18n";
 import { GameMap, type GameMapHandle } from "./GameMap";
 import { ChallengeBanner } from "./ChallengeBanner";
 import { ReportSheet, type Picked } from "./ReportSheet";
@@ -14,12 +15,13 @@ export interface MapFocus { beachId?: string; reportId?: string; n: number }
 
 const snap = (lng: number, lat: number): Picked => {
   const s = snapToCoast(lng, lat);
-  return { lng: s.lng, lat: s.lat, beachId: s.beachId, beachName: beachById(s.beachId)?.name ?? "The coast" };
+  return { lng: s.lng, lat: s.lat, beachId: s.beachId, beachName: beachById(s.beachId)?.name ?? null };
 };
 
 /** The Map tab: map, report button, report sheet and report detail. */
 export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
   const map = useRef<GameMapHandle>(null);
+  const { t } = useI18n();
   const reports = useMemo(() => game.state?.reports ?? [], [game.state]);
   const league = useMemo(() => game.state?.league ?? [], [game.state]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
 
   const onSubmitted = async (res: ReportResult) => {
     closeReport();
-    showPoints({ points: res.points, title: "Thanks for reporting!", badges: res.newBadges });
+    showPoints({ points: res.points, title: t("toast.reported"), badges: res.newBadges });
     setKept(res.report);
     map.current?.flyTo(res.report.lng, res.report.lat, 15);
     await game.refresh();
@@ -71,7 +73,7 @@ export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
     <div className="relative size-full overflow-hidden bg-sea">
       <GameMap ref={map} reports={reports} league={league} selectedId={selectedId}
         onSelectReport={(id) => { if (!reporting) setSelectedId(id); }}
-        pick={picking ? pick : null} onPick={(lng, lat) => setPick(snap(lng, lat))} pickLabel={pick?.beachName}
+        pick={picking ? pick : null} onPick={(lng, lat) => setPick(snap(lng, lat))} pickLabel={pick ? pick.beachName ?? t("map.theCoast") : undefined}
         />
 
       <div className="pointer-events-none absolute left-3 top-3 z-10">
@@ -82,7 +84,7 @@ export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
         <div className="pointer-events-none absolute inset-x-0 bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-10 flex justify-center">
           <button type="button" onClick={() => { setSelectedId(null); setReporting(true); }}
             className="pointer-events-auto flex h-16 items-center gap-2.5 rounded-full bg-coral pl-6 pr-7 text-lg font-extrabold text-white shadow-xl shadow-coral/40 ring-4 ring-white/70 transition active:scale-95">
-            <Camera className="size-6" /> Report trash
+            <Camera className="size-6" /> {t("map.reportTrash")}
           </button>
         </div>
       )}

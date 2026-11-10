@@ -7,9 +7,19 @@ const TAG_PROMPT = 'You see a photo reported as trash on a Bali beach. Reply wit
 const COMPARE_PROMPT = 'Photo 1 is trash reported on a beach. Photo 2 was taken after a cleanup at the same spot. Reply with JSON only: {"clean_score":0-100,"reason":"under 15 words"}. Score 0 if photo 2 is a different place or still has the trash.';
 const SINGLE_PROMPT = 'Does this photo show a clean beach spot with no trash? JSON only: {"clean_score":0-100,"reason":"under 15 words"}';
 
+/** Languages the app is translated into. Claude writes its short notes in the player's one. */
+export type Lang = "en" | "zh" | "id";
+export const asLang = (v: unknown): Lang => (v === "zh" || v === "id" ? v : "en");
+const WRITE_IN: Record<Lang, string> = {
+  en: "",
+  zh: ' Write the "summary" or "reason" text in Simplified Chinese.',
+  id: ' Write the "summary" or "reason" text in Indonesian.',
+};
+const UNREADABLE: Record<Lang, string> = { en: "Photo could not be read", zh: "无法读取照片", id: "Foto tidak bisa dibaca" };
+
 const image = (data: string) => ({ type: "image", source: { type: "base64", media_type: "image/jpeg", data } });
 
-async function ask(content: unknown[]): Promise<Record<string, unknown> | null> {
+async function ask(content: unknown[], lang: Lang): Promise<Record<string, unknown> | null> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return null;
   const base = (process.env.ANTHROPIC_BASE_URL ?? "https://api.anthropic.com").replace(/\/+$/, "");
@@ -23,7 +33,7 @@ async function ask(content: unknown[]): Promise<Record<string, unknown> | null> 
       body: JSON.stringify({ model: process.env.MODEL || "claude-sonnet-5-5", max_tokens: 2000, output_config: { effort: "low" }, messages: [{ role: "user", content }] }),
     });
     // Anthropic could not read the image: that is the photo's fault, not an outage, so it must not pass as "unverified"
-    if (res.status === 400) { console.error("claude 400:", (await res.text()).slice(0, 300)); return { clean_score: 0, reason: "Photo could not be read" }; }
+    if (res.status === 400) { console.error("claude 400:", (await res.text()).slice(0, 300)); return { clean_score: 0, reason: UNREADABLE[lang] }; }
     if (!res.ok) { console.error("claude", res.status, (await res.text()).slice(0, 300)); return null; }
     const body = (await res.json()) as { content?: { type: string; text?: string }[] };
     const text = (body.content ?? []).filter((b) => b.type === "text").map((b) => b.text ?? "").join("\n");
@@ -39,8 +49,8 @@ async function ask(content: unknown[]): Promise<Record<string, unknown> | null> 
   }
 }
 
-export async function tagPhoto(b64: string): Promise<{ isTrash: boolean; type: TrashType; size: Size; summary: string } | null> {
-  const o = await ask([image(b64), { type: "text", text: TAG_PROMPT }]);
+export async function tagPhoto(b64: string, lang: Lang = "en"): Promise<{ isTrash: boolean; type: TrashType; size: Size; summary: string } | null> {
+  const o = await ask([image(b64), { type: "text", text: TAG_PROMPT + WRITE_IN[lang] }], lang);
   if (!o) return null;
   const type = TYPES.includes(o.type as TrashType) ? (o.type as TrashType) : "mixed";
   const sz = typeof o.size === "string" ? o.size.trim().toUpperCase() : "";
@@ -50,11 +60,11 @@ export async function tagPhoto(b64: string): Promise<{ isTrash: boolean; type: T
   return { isTrash, type, size, summary };
 }
 
-export async function compareCleanup(beforeB64: string | null, afterB64: string): Promise<{ score: number; reason: string } | null> {
+export async function compareCleanup(beforeB64: string | null, afterB64: string, lang: Lang = "en"): Promise<{ score: number; reason: string } | null> {
   const content = beforeB64
-    ? [image(beforeB64), image(afterB64), { type: "text", text: COMPARE_PROMPT }]
-    : [image(afterB64), { type: "text", text: SINGLE_PROMPT }];
-  const o = await ask(content);
+    ? [image(beforeB64), image(afterB64), { type: "text", text: COMPARE_PROMPT + WRITE_IN[lang] }]
+    : [image(afterB64), { type: "text", text: SINGLE_PROMPT + WRITE_IN[lang] }];
+  const o = await ask(content, lang);
   if (!o) return null;
   const n = Number(o.clean_score ?? o.score);
   if (!Number.isFinite(n)) return null;
