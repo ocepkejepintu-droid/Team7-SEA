@@ -39,7 +39,7 @@ export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
       if (focus.beachId) { setSelectedId(null); map.current?.fitBeach(focus.beachId); map.current?.showBeach(focus.beachId); }
       if (focus.reportId) {
         const r = reports.find((x) => x.id === focus.reportId);
-        if (r) { map.current?.flyTo(r.lng, r.lat, 15); setSelectedId(r.id); }
+        if (r) { setKept(r); setSelectedId(r.id); }
       }
     });
   }, [focus, reports]);
@@ -72,7 +72,7 @@ export function MapScreen({ game, focus }: { game: Game; focus?: MapFocus }) {
       <GameMap ref={map} reports={reports} league={league} selectedId={selectedId}
         onSelectReport={(id) => { if (!reporting) setSelectedId(id); }}
         pick={picking ? pick : null} onPick={(lng, lat) => setPick(snap(lng, lat))} pickLabel={pick?.beachName}
-        bottomPad={selected ? 360 : 0} />
+        />
 
       <div className="pointer-events-none absolute left-3 top-3 z-10">
         <div className="pointer-events-auto"><ChallengeBanner challenge={game.state?.challenge} /></div>

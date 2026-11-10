@@ -40,7 +40,7 @@ function beachBounds(id: string): LngLatBoundsLike | null {
   return [[x0, y0], [x1, y1]];
 }
 
-export function GameMap({ reports, league, selectedId, onSelectReport, pick, onPick, pickLabel, bottomPad = 0, ref }: {
+export function GameMap({ reports, league, selectedId, onSelectReport, pick, onPick, pickLabel, ref }: {
   reports: Report[];
   league: BeachStanding[];
   selectedId?: string | null;
@@ -49,7 +49,6 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
   pick: { lng: number; lat: number } | null;
   onPick: (lng: number, lat: number) => void;
   pickLabel?: string;
-  bottomPad?: number;
   ref?: Ref<GameMapHandle>;
 }) {
   const box = useRef<HTMLDivElement>(null);
@@ -107,7 +106,7 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
   };
 
   useImperativeHandle(ref, () => ({
-    flyTo: (lng, lat, zoom = 15) => { const m = mapRef.current; if (!m) return; m.resize(); m.flyTo({ center: [lng, lat], zoom: Math.max(m.getZoom(), zoom), duration: reduced() ? 0 : 1200, padding: { top: 60, bottom: bottomPad + 40, left: 20, right: 20 } }); },
+    flyTo: (lng, lat, zoom = 15) => { const m = mapRef.current; if (!m) return; m.resize(); m.flyTo({ center: [lng, lat], zoom: Math.max(m.getZoom(), zoom), duration: reduced() ? 0 : 1200 }); },
     fitBeach: (id) => { const m = mapRef.current; const b = beachBounds(id); if (!m || !b) return; m.resize(); m.fitBounds(b, { padding: { top: 120, bottom: 120, left: 50, right: 70 }, maxZoom: 14, duration: reduced() ? 0 : 1000 }); },
     showBeach: (id) => showBeach(id),
     center: () => { const c = mapRef.current?.getCenter(); return c ? [c.lng, c.lat] : null; },
@@ -131,13 +130,13 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
           { id: "land", type: "fill", source: "land", paint: { "fill-color": LAND } },
           { id: "land-edge", type: "line", source: "land", paint: { "line-color": LAND_EDGE, "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.4, 14, 1] } },
           { id: "coast-case", type: "line", source: "coast", layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
-            paint: { "line-color": "#ffffff", "line-width": ["interpolate", ["linear"], ["zoom"], 9, 7, 12, 10, 15, 16] } },
+            paint: { "line-color": "#ffffff", "line-width": ["interpolate", ["linear"], ["zoom"], 8, 3.5, 10, 6.5, 12, 9.5, 15, 15] } },
           { id: "coast", type: "line", source: "coast", layout: { "line-cap": "round", "line-join": "round" },
-            paint: { "line-color": ["get", "color"], "line-width": ["interpolate", ["linear"], ["zoom"], 9, 4, 12, 6, 15, 11] } },
+            paint: { "line-color": ["get", "color"], "line-width": ["interpolate", ["linear"], ["zoom"], 8, 2, 10, 4, 12, 6, 15, 10] } },
           { id: "halo", type: "circle", source: "reports", filter: ["==", ["get", "kind"], "hot"],
             paint: { "circle-color": CORAL, "circle-opacity": 0.3, "circle-radius": 14, "circle-blur": 0.2 } },
           { id: "r-clean", type: "circle", source: "reports", filter: ["==", ["get", "kind"], "clean"],
-            paint: { "circle-color": GOOD, "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5, "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, 3, 14, 5, 17, 7] } },
+            paint: { "circle-color": GOOD, "circle-stroke-color": ["case", ["get", "sel"], "#12343b", "#ffffff"], "circle-stroke-width": ["case", ["get", "sel"], 3, 1.5], "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, 3, 14, 5, 17, 7] } },
           { id: "r-open", type: "circle", source: "reports", filter: ["!=", ["get", "kind"], "clean"],
             paint: { "circle-color": CORAL, "circle-stroke-color": ["case", ["get", "sel"], "#12343b", "#ffffff"], "circle-stroke-width": ["case", ["get", "sel"], 3, 2],
               "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, ["case", ["==", ["get", "kind"], "hot"], 6.5, 4.5], 14, ["case", ["==", ["get", "kind"], "hot"], 9, 7], 17, ["case", ["==", ["get", "kind"], "hot"], 12, 9]] } },
@@ -220,7 +219,21 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
     map.setLayoutProperty("coast-case", "visibility", sat ? "visible" : "none");
     map.setLayoutProperty("land", "visibility", sat ? "none" : "visible");
     map.setLayoutProperty("land-edge", "visibility", sat ? "none" : "visible");
+    // The compact attribution opens itself when imagery appears; fold it after a moment so it does not cover the buttons.
+    const t = setTimeout(() => box.current?.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show"), 2500);
+    return () => clearTimeout(t);
   }, [mode, ready]);
+
+  // Keep the selected report visible above the bottom sheet.
+  useEffect(() => {
+    const map = mapRef.current;
+    const r = selectedId ? reportsRef.current.find((x) => x.id === selectedId) : null;
+    if (!map || !r) return;
+    const h = map.getContainer().clientHeight;
+    const p = map.project([r.lng, r.lat]);
+    if (p.y > 70 && p.y < h * 0.4 && p.x > 30 && p.x < map.getContainer().clientWidth - 70) return;
+    map.easeTo({ center: [r.lng, r.lat], zoom: Math.max(map.getZoom(), 14), offset: [0, -Math.round(h * 0.3)], duration: reduced() ? 0 : 700 });
+  }, [selectedId]);
 
   // Pick pin.
   useEffect(() => {
