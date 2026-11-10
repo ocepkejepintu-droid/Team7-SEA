@@ -40,7 +40,7 @@ const PROFILES: Profile[] = [
   { match: eq("Pecatu"), n: 5, cleaned: 3, bias: "S" },
   { match: starts("Padangbai", "Padang Bai"), n: 5, cleaned: 3, bias: "S" },
   { match: eq("Jimbaran"), n: 5, cleaned: 3, bias: "M" },
-  { match: eq("Purwakerthi"), n: 4, cleaned: 2, bias: "M" },
+  { match: eq("Purwa Kerthi"), n: 4, cleaned: 2, bias: "M" },
   { match: eq("Seminyak"), n: 5, cleaned: 2, bias: "M" },
   { match: eq("Canggu"), n: 6, cleaned: 2, bias: "M" },
   { match: eq("Legian"), n: 6, cleaned: 1, bias: "L" },

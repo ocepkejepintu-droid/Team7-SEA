@@ -155,6 +155,7 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
     map.keyboard.disableRotation();
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-left");
     mapRef.current = map;
+    if (import.meta.env.DEV) (window as unknown as { __pantaiMap?: MlMap }).__pantaiMap = map; // for browser tests
 
     map.on("load", () => {
       setReady(true);

@@ -107,14 +107,15 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
 
   async function api(req: IncomingMessage, res: ServerResponse, route: string) {
     const method = req.method ?? "GET";
-    if (method === "GET" && route === "state") return json(res, 200, state(req));
+    if ((method === "GET" || method === "HEAD") && route === "state") return json(res, 200, state(req));
 
-    if (method === "GET" && route.startsWith("photos/")) {
+    if ((method === "GET" || method === "HEAD") && route.startsWith("photos/")) {
       const file = decodeURIComponent(route.slice(7));
       if (!/^[A-Za-z0-9_-][A-Za-z0-9._-]*\.(jpg|jpeg|svg)$/.test(file) || file.includes("..")) throw new HttpError(404, "Not found");
       const full = path.join(store.photosDir, file);
       if (!full.startsWith(store.photosDir + path.sep) || !fs.existsSync(full)) throw new HttpError(404, "Not found");
       res.writeHead(200, { "content-type": MIME[path.extname(file)] ?? "application/octet-stream", "cache-control": "public, max-age=31536000, immutable" });
+      if (method === "HEAD") return void res.end();
       fs.createReadStream(full).pipe(res);
       return;
     }
