@@ -2,7 +2,7 @@
 
 A 1:53 launch video for the hackathon presentation: 1920×1080, 60 fps, with a soundtrack.
 
-**Watch:** [`out/hai-pantai-launch.mp4`](out/hai-pantai-launch.mp4)
+**Watch:** [`out/hai-pantai-launch.mp4`](out/hai-pantai-launch.mp4) (full, 1:53) or [`out/hai-pantai-30s.mp4`](out/hai-pantai-30s.mp4) (30-second cut: the hook, logo, each step, under the hood and the finale, cut on bar lines from the full film)
 
 Everything in it is made in code: vector illustrations, the app's real colours and font (Nunito), the real Bali map (716 village polygons and 173 beach coastlines from `web/public/land.json` and `shared/coast.json`), and a synthesized score. There is no stock footage or stock audio, so nothing needs a licence.
 
