@@ -162,7 +162,10 @@ scene({
         <div class="h3" id="f-tag" style="margin-top:44px;font-size:60px;color:#bfeee8">Bali’s coast is the <span style="color:var(--sun)">scoreboard.</span></div>
         <div id="f-cta" style="display:inline-flex;align-items:center;gap:18px;margin-top:56px;height:88px;padding:0 44px;border-radius:999px;background:var(--sand);color:var(--ink);font-weight:1000;font-size:38px">Play the demo <span style="color:var(--teal)">→ 43.163.0.197/pantai</span></div>
       </div>
-      <div class="abs" id="f-foot" style="left:0;right:0;bottom:60px;text-align:center;font-weight:900;font-size:26px;letter-spacing:.2em;text-transform:uppercase;color:#5eead4">Team 7 · Hackathon · 10 Nov 2026</div>
+      <div class="abs" id="f-foot" style="left:0;right:0;bottom:60px;text-align:center;color:#5eead4">
+        <div style="font-weight:1000;font-size:44px;letter-spacing:-0.01em;color:var(--sand)">Team7</div>
+        <div style="font-weight:800;font-size:26px;margin-top:8px">ATOX × Tsinghua x-lab <span style="opacity:.5">|</span> Bali Innovation Co-Lab 10.11.26</div>
+      </div>
       <div class="vignette"></div>
       <div class="abs" id="f-black" style="inset:0;background:#000"></div>`;
     const svg = $("#f-isl", root);
