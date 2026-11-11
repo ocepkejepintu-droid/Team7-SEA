@@ -1,4 +1,6 @@
 // Illustrations and reusable UI pieces for the video. All vector, all brand colours.
+// Stage size: landscape film, or the vertical IG Story cut (window.VERT).
+const VW = window.VERT ? 1080 : 1920, VH = window.VERT ? 1920 : 1080;
 const C = {
   ink: "#12343b", teal: "#0e9f9a", tealInk: "#0b6b68", tealSoft: "#e6f5f4", sand: "#fbf6ec", muted: "#f3ecdd",
   border: "#eadfc8", coral: "#ff6b4a", coralSoft: "#ffe7e1", good: "#22c55e", goodSoft: "#dcfce7", amber: "#f59e0b",

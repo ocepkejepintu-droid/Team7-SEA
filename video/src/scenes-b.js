@@ -1,5 +1,5 @@
 // Scenes 5-7: Report, Clean, Compete.
-const PH = { x: 330, y: 125 };           // phone position
+const PH = window.VERT ? { x: 340, y: 850, s: 1 } : { x: 330, y: 125, s: 1 };           // phone position
 const SW = 374, SHH = 804;                // screen size
 const MV = { x: 800, y: 596, w: 300 };    // phone map viewBox (geo units)
 MV.k = SW / MV.w; MV.h = SHH / MV.k;
@@ -52,7 +52,7 @@ function bulletsAt(root, t, times, outAt) {
 }
 function phoneIn(el, t, a = 0) {
   const k = spring(t - a, 7, 6);
-  tf(el, { x: PH.x, y: PH.y + (1 - k) * 900, r: (1 - k) * -10 });
+  tf(el, { x: PH.x, y: PH.y + (1 - k) * 900, r: (1 - k) * -10, s: PH.s });
 }
 
 // ---------- 5. Report it ----------
@@ -257,7 +257,7 @@ scene({
     root.__conf = [...Array(26)].map((_, i) => { const el = h(`<div class="abs" style="width:16px;height:16px;border-radius:${i % 2 ? 4 : 8}px;background:${["#0e9f9a", "#ff6b4a", "#ffd27a", "#22c55e"][i % 4]}"></div>`); $("#c-eq", root).appendChild(el); const a = (i / 26) * Math.PI * 2; return { el, a, d: 180 + (i % 5) * 50 }; });
   },
   update(t, root) {
-    tf($("#c-phone", root), { x: PH.x - ease(t, 13.7, 14.4, E.inBack) * 900, y: PH.y, r: -ease(t, 13.7, 14.4) * 8 });
+    tf($("#c-phone", root), { x: PH.x - ease(t, 13.7, 14.4, E.inBack) * 900, y: PH.y, r: -ease(t, 13.7, 14.4) * 8, s: PH.s });
     const caps = $("#c-caps", root);
     tf($(".eyebrow", caps), { y: (1 - ease(t, 0.2, 0.7)) * 30, o: ease(t, 0.2, 0.7) * (1 - ease(t, 13.7, 14.2)) });
     rise($(".cap-t", caps), t, 0.25, { out: 13.7, dist: 160 });

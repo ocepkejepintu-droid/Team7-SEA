@@ -84,7 +84,7 @@ scene({
 });
 
 // ---------- 2. The problem: 173 beaches, trash on all of them ----------
-const ISL = { x: 640, y: 168, w: 1210 };
+const ISL = window.VERT ? { x: 40, y: 640, w: 1000 } : { x: 640, y: 168, w: 1210 };
 ISL.s = ISL.w / GEO.w; ISL.h = GEO.h * ISL.s;
 function islandSVG(id, { fill = "#0d4a50", coastFill = "#11605f", stroke = "rgba(255,255,255,.08)" } = {}) {
   return `<svg class="abs" id="${id}" style="left:${ISL.x}px;top:${ISL.y}px;overflow:visible" width="${ISL.w}" height="${ISL.h.toFixed(0)}" viewBox="0 0 ${GEO.w} ${GEO.h}">
@@ -157,7 +157,7 @@ scene({
     rise($("#p-c", root), t, 5.5, { out: 7.1, stagger: 0.04 });
     // camera: slow push, then dim for the question
     const q = ease(t, 7.5, 8.4, E.inOutCubic);
-    tf($("#p-cam", root), { s: 1 + t * 0.006 + q * 0.06, x: -q * 300, o: 1 - q * 0.75, origin: "60% 50%" });
+    tf($("#p-cam", root), { s: 1 + t * 0.006 + q * 0.06, x: window.VERT ? 0 : -q * 300, o: 1 - q * 0.75, origin: "60% 50%" });
     rise($("#p-q", root), t, 7.8, { stagger: 0.07, dist: 170 });
     const iris = E.inCubic(prog(t, 8.75, 9.6));
     tf($("#p-iris", root), { s: iris, o: iris > 0 ? 1 : 0 });

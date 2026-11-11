@@ -76,6 +76,10 @@ const NODES = [
   { id: "rules", x: 1410, y: 650, t: "One rules file", e: "🎲", l: ["Points, health, the league", "Same code in server and app"] },
 ];
 const NW = 400, NH = 250;
+if (window.VERT) {
+  const P = { app: [340, 470], api: [80, 820], ai: [600, 820], geo: [80, 1170], rules: [600, 1170] };
+  NODES.forEach((n) => { [n.x, n.y] = P[n.id]; });
+}
 const LINKS = [["app", "api", "polls every 5 s"], ["api", "ai", "photos"], ["api", "geo", ""], ["api", "rules", ""]];
 scene({
   name: "tech", t0: S.tech, t1: S.finale,
@@ -85,6 +89,10 @@ scene({
     const linkPath = ([a, b]) => {
       const A = by[a], B = by[b];
       let [x1, y1] = ctr(A), [x2, y2] = ctr(B);
+      if (window.VERT) {
+        if (B.y > A.y + NH / 2) { x1 = A.x + NW / 2; y1 = A.y + NH; x2 = B.x + NW / 2; y2 = B.y; const my = (y1 + y2) / 2; return `M${x1} ${y1} C${x1} ${my} ${x2} ${my} ${x2} ${y2}`; }
+        return `M${A.x + NW} ${y1} L${B.x} ${y2}`;
+      }
       if (A.x < B.x) { x1 = A.x + NW; x2 = B.x; } else { x1 = A.x + NW / 2; }
       if (A.id === "api" && B.id === "geo") { x1 = A.x + NW / 2; y1 = A.y + NH; x2 = B.x + NW / 2; y2 = B.y; return `M${x1} ${y1} L${x2} ${y2}`; }
       const mx = (x1 + x2) / 2;
@@ -98,14 +106,14 @@ scene({
           <div class="eyebrow" id="t-eb" style="color:var(--teal-glow)">Built in one day</div>
           <div class="h1" id="t-h" style="font-size:104px;margin-top:14px">Under the hood.</div>
         </div>
-        <svg class="abs" style="left:0;top:0" width="1920" height="1080">
+        <svg class="abs" style="left:0;top:0" width="${VW}" height="${VH}">
           ${LINKS.map((l, i) => `<path class="t-link" id="tl${i}" d="${linkPath(l)}" fill="none" stroke="#5eead4" stroke-width="3" opacity=".7"/>`).join("")}
           ${LINKS.map((l, i) => `<circle class="t-pk" id="tp${i}" r="7" fill="#ffd27a"/>`).join("")}
         </svg>
         ${NODES.map((n) => `<div class="abs t-node" style="left:${n.x}px;top:${n.y}px;width:${NW}px;height:${NH}px;border-radius:32px;background:rgba(14,159,154,.12);border:2px solid rgba(94,234,212,.35);padding:30px 32px;backdrop-filter:blur(4px)">
           <div style="display:flex;gap:16px;align-items:center"><div style="width:62px;height:62px;border-radius:20px;background:${n.id === "ai" ? "#ffd27a" : "rgba(94,234,212,.18)"};color:#12343b;display:grid;place-items:center;font-size:34px;font-weight:1000">${n.e}</div><div style="font-weight:1000;font-size:36px;letter-spacing:-0.02em">${n.t}</div></div>
           ${n.l.map((s, i) => `<div style="font-weight:800;font-size:24px;margin-top:${i ? 8 : 26}px;color:${i ? "#5eead4" : "#d7f5f1"}">${s}</div>`).join("")}</div>`).join("")}
-        <div class="abs" id="t-lab" style="left:${110 + NW + 14}px;top:${380 + NH / 2 + 16}px;font-weight:900;font-size:20px;color:#ffd27a">polls every 5 s</div>
+        <div class="abs" id="t-lab" style="left:${window.VERT ? 560 : 110 + NW + 14}px;top:${window.VERT ? 740 : 380 + NH / 2 + 16}px;font-weight:900;font-size:20px;color:#ffd27a">polls every 5 s</div>
         <div class="abs" id="t-fb" style="left:110px;top:950px;display:flex;align-items:center;gap:18px;font-weight:800;font-size:30px;color:#d7f5f1">
           <span class="chip" style="height:46px;font-size:20px;background:#ffd27a;border:none;color:#12343b">NO API KEY?</span>
           It still works. Players tag the photo, and cleanups count as unverified.</div>

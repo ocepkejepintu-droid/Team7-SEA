@@ -2,7 +2,7 @@
 
 A 1:53 launch video for the hackathon presentation: 1920×1080, 60 fps, with a soundtrack.
 
-**Watch:** [`out/hai-pantai-launch.mp4`](out/hai-pantai-launch.mp4) (full, 1:53) or [`out/hai-pantai-30s.mp4`](out/hai-pantai-30s.mp4) (31 s).
+**Watch:** [`out/hai-pantai-launch.mp4`](out/hai-pantai-launch.mp4) (full, 1:53), [`out/hai-pantai-30s.mp4`](out/hai-pantai-30s.mp4) (31 s) or [`out/hai-pantai-story.mp4`](out/hai-pantai-story.mp4) (31 s vertical IG Story, 1080×1920, `src/vertical.html` with the portrait layout in `src/vert.css`).
 
 The 30-second version is its own render, `src/short.html` with the shot list in `src/short-timeline.js`. It plays the hook, the logo, Report, Clean, Compete, under the hood and the finale, with some scenes sped up, crossfades between scenes and its own continuous soundtrack. It leaves out the Workshop. Its report photo is a real player report from the live app (bottles, size L, `assets/report-bottles.jpg`). No report has been cleaned yet, so the clean step shows only that before photo.
 
@@ -38,6 +38,7 @@ node build-geo.mjs          # Bali geometry -> src/geo.js (already committed)
 node audio.mjs              # soundtrack -> out/soundtrack.wav
 node render.mjs             # frames -> out/hai-pantai-launch.mp4 (about 12 min)
 node render.mjs --short     # the 30 s version -> out/hai-pantai-30s.mp4 (about 4 min)
+node render.mjs --vertical --fps 30   # IG Story, 1080×1920 -> out/hai-pantai-story.mp4 (about 1 min)
 ```
 
 - Preview live in a browser: open `src/index.html?play` (or `?play=45` to start at 0:45). `?t=52.5` shows one frame.

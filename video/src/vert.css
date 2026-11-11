@@ -1,0 +1,56 @@
+/* Vertical IG Story layout (1080×1920). Overrides the landscape positions.
+   Key content stays between y 240 and 1690, clear of the Story's top bar and reply bar. */
+html.vert, html.vert body { width: 1080px; height: 1920px; }
+html.vert #stage { width: 1080px; height: 1920px; }
+.vert .phone { transform-origin: 0 0; }
+
+/* problem */
+.vert div:has(> #p-eb) { left: 80px !important; top: 250px !important; width: 920px !important; }
+.vert #p-a { margin-top: 720px !important; }
+.vert div:has(> #p-q) { top: 790px !important; }
+.vert #p-q { font-size: 118px !important; }
+.vert #p-iris { left: 540px !important; top: 960px !important; }
+
+/* logo */
+.vert div:has(> #l-eb) { top: 470px !important; }
+.vert #l-lock { top: 540px !important; flex-direction: column; gap: 36px !important; }
+.vert #l-markw { width: 300px !important; height: 300px !important; }
+.vert #l-word { font-size: 176px !important; }
+.vert #l-tag { top: 1120px !important; flex-direction: column; align-items: center; gap: 6px !important; }
+.vert #l-tag .tg { font-size: 88px !important; }
+.vert #l-sub { top: 1470px !important; padding: 0 90px; font-size: 36px !important; }
+.vert #l-conf { left: 540px !important; top: 760px !important; }
+
+/* report and clean: captions on top, phone below */
+.vert .caps { left: 80px !important; top: 240px !important; width: 920px !important; }
+.vert .caps .cap-t { font-size: 120px !important; }
+.vert .bullets { margin-top: 34px; gap: 20px; }
+.vert .bl { font-size: 36px; }
+.vert .bl small { font-size: 26px; }
+.vert .scene[data-name=report] > div:nth-child(2), .vert .scene[data-name=clean] > div:nth-child(2) { left: 160px !important; top: 860px !important; width: 760px !important; }
+.vert #c-eq { left: 80px !important; top: 420px !important; width: 920px !important; }
+.vert #c-eq > div:first-child, .vert #c-eq2 { font-size: 70px !important; gap: 14px !important; }
+.vert #c-eq2 { margin-top: 18px !important; }
+.vert #c-eq .eql { font-size: 18px !important; }
+.vert #c-eq3 { font-size: 150px !important; margin-top: 6px !important; }
+.vert #c-note { left: 80px !important; top: 500px !important; width: 920px !important; }
+
+/* compete: stacked cards */
+.vert div:has(> #k-eb) { left: 80px !important; top: 240px !important; }
+.vert #k-h { font-size: 100px !important; }
+.vert #k-cap { top: 400px !important; font-size: 31px !important; padding: 0 50px; }
+.vert #k-left { left: 60px !important; top: 470px !important; width: 960px !important; height: 600px !important; padding: 36px 40px !important; }
+.vert #k-right { left: 60px !important; top: 1090px !important; width: 960px !important; height: 590px !important; padding: 32px 40px !important; }
+
+/* under the hood */
+.vert div:has(> #t-eb) { left: 80px !important; top: 240px !important; }
+.vert #t-fb { left: 80px !important; top: 1470px !important; width: 920px; flex-wrap: wrap; }
+
+/* finale */
+.vert #f-stat { left: 80px !important; top: 250px !important; }
+.vert #f-lock { top: 600px !important; }
+.vert #f-lock > div:first-child { flex-direction: column; gap: 30px !important; }
+.vert #f-word { font-size: 170px !important; }
+.vert #f-tag { font-size: 56px !important; padding: 0 60px; }
+.vert #f-cta { font-size: 34px !important; }
+.vert #f-foot { bottom: 300px !important; font-size: 24px !important; }
