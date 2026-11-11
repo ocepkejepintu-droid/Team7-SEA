@@ -59,8 +59,11 @@ function phoneIn(el, t, a = 0) {
 scene({
   name: "report", t0: S.report, t1: S.clean,
   build(root) {
-    const bx = TRASH_BOXES.map((b) => {
-      const s = Math.max(338 / 360, 230 / 300), oy = (230 - 300 * s) / 2;
+    const bx = (window.SHORT ? REAL_BOXES.map((b) => {
+      const s = Math.max(338 / 576, 230 / 384), W = 576 * s, H = 384 * s, ox = (338 - W) / 2, oy = (230 - H) / 2;
+      return { x: (b.x / 100 * W + ox) / s, y: (b.y / 100 * H + oy) / s, w: b.w / 100 * W / s, h: b.h / 100 * H / s, label: b.label, s, oy: 0 };
+    }) : TRASH_BOXES).map((b) => {
+      const s = b.s ?? Math.max(338 / 360, 230 / 300), oy = b.oy ?? (230 - 300 * s) / 2;
       return `<div class="rbox abs" style="left:${b.x * s}px;top:${b.y * s + oy}px;width:${b.w * s}px;height:${b.h * s}px;border:3px solid #5eead4;border-radius:10px;box-shadow:0 0 0 2px rgba(0,0,0,.15)"><span style="position:absolute;left:-3px;top:-24px;background:#0e9f9a;color:#fff;font-weight:900;font-size:11px;padding:3px 7px;border-radius:7px;white-space:nowrap">${b.label}</span></div>`;
     }).join("");
     root.innerHTML = `
@@ -91,7 +94,7 @@ scene({
           ${beachPhoto(true, "rs")}
           <div class="abs" id="r-boxes" style="inset:0">${bx}</div>
           <div class="abs" id="r-scan" style="left:0;right:0;top:0;height:70px;background:linear-gradient(180deg,rgba(94,234,212,0),rgba(94,234,212,.5));border-bottom:3px solid #5eead4"></div>
-          <div class="abs chip" id="r-ai" style="left:10px;bottom:10px;background:rgba(18,52,59,.85);border:none;color:#fff"><span style="color:#5eead4">✦</span><span id="r-ai-t">Claude is looking…</span></div>
+          <div class="abs chip" id="r-ai" style="left:10px;${window.SHORT ? "top:10px" : "bottom:10px"};background:rgba(18,52,59,.85);border:none;color:#fff"><span style="color:#5eead4">✦</span><span id="r-ai-t">Claude is looking…</span></div>
         </div>
         <div class="abs" id="r-skel" style="left:18px;right:18px;top:356px">${[220, 300, 180].map((w) => `<div style="width:${w}px;height:26px;border-radius:13px;background:linear-gradient(90deg,#efe5cf,#f8f1e2,#efe5cf);margin-bottom:16px"></div>`).join("")}</div>
         <div class="abs" id="r-tags" style="left:18px;right:18px;top:352px">
@@ -118,7 +121,7 @@ scene({
     $("#r-tap2", root).style.cssText += `left:${SW / 2}px;top:${SHH - 100}px`;
     $("#r-tap3", root).style.cssText += `left:${SW / 2 + 40}px;top:708px`;
     split($(".cap-t", root));
-    root.__sum = "“A large pile of plastic bottles and a bag at the tide line.”";
+    root.__sum = window.SHORT ? "“A large pile of plastic bottles along the shore.”" : "“A large pile of plastic bottles and a bag at the tide line.”";
   },
   update(t, root) {
     phoneIn($("#r-phone", root), t, 0);
@@ -236,7 +239,7 @@ scene({
           <div class="abs" id="c-after" style="inset:0">${beachPhoto(false, "cv2")}</div>
           <div class="abs" id="c-div" style="top:0;bottom:0;width:4px;margin-left:-2px;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.3)"><div style="position:absolute;top:50%;left:-16px;margin-top:-18px;width:36px;height:36px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:1000;font-size:14px;color:var(--ink)">⇆</div></div>
           <span class="chip abs" style="left:10px;top:10px;height:28px;font-size:13px;background:rgba(18,52,59,.8);border:none;color:#fff">Before</span>
-          <span class="chip abs" style="right:10px;top:10px;height:28px;font-size:13px;background:rgba(14,159,154,.9);border:none;color:#fff">After</span>
+          <span class="chip abs" style="right:10px;top:10px;height:28px;font-size:13px;background:rgba(14,159,154,.9);border:none;color:#fff">${window.SHORT ? "After: ✓ clean" : "After"}</span>
         </div>
         <div class="abs" style="left:18px;right:18px;top:380px;display:flex;align-items:center;gap:20px">
           <svg width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="62" stroke="#eadfc8" stroke-width="14" fill="none"/><circle id="c-ring" cx="75" cy="75" r="62" stroke="#22c55e" stroke-width="14" fill="none" stroke-linecap="round" transform="rotate(-90 75 75)"/>
@@ -296,9 +299,10 @@ scene({
     tf($("#c-ver", root), { y: vOut * SHH, o: t > 3.45 ? prog(t, 3.45, 3.6) : 0 });
     const sw = ease(t, 3.6, 4.9, E.inOutCubic);
     const cut = (100 - sw * 100).toFixed(2);
-    $("#c-after", root).style.clipPath = `inset(0 0 0 ${cut}%)`;
+    // The 30s cut has no real after photo, so it shows only the real before photo.
+    $("#c-after", root).style.clipPath = window.SHORT ? "inset(0 0 0 100%)" : `inset(0 0 0 ${cut}%)`;
     $("#c-div", root).style.left = cut + "%";
-    op($("#c-div", root), sw > 0 && sw < 1 ? 1 : 0);
+    op($("#c-div", root), !window.SHORT && sw > 0 && sw < 1 ? 1 : 0);
     const sc = Math.round(92 * ease(t, 5.0, 6.4, E.outCubic));
     txt($("#c-score", root), String(sc));
     const R = $("#c-ring", root), L = 2 * Math.PI * 62;

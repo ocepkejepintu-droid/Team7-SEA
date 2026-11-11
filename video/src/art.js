@@ -46,7 +46,15 @@ const TRASH_BOXES = [
   { x: 176, y: 196, w: 92, h: 52, label: "plastic bag · 0.94" },
   { x: 236, y: 166, w: 70, h: 44, label: "bottle · 0.91" },
 ];
+// In the 30s cut the "before" photo is a real report from the live app (bottles, size L).
+// Boxes are in percent of that photo.
+const REAL_BOXES = [
+  { x: 35.5, y: 70, w: 14.5, h: 9, label: "bottle · 0.97" },
+  { x: 52, y: 56, w: 9, h: 6.5, label: "bottle · 0.93" },
+  { x: 52, y: 82, w: 14, h: 15, label: "bottle · 0.95" },
+];
 function beachPhoto(dirty, id = "") {
+  if (window.SHORT && dirty) return `<img class="photo" src="../assets/report-bottles.jpg" style="object-fit:cover" alt="">`;
   const g = (s) => `${id}${s}`;
   const trash = `
     <g class="trash">

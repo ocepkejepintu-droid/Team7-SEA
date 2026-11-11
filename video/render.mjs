@@ -1,4 +1,4 @@
-// Renders src/index.html frame by frame and encodes out/hai-pantai-launch.mp4
+// Renders src/index.html (or src/short.html with --short) frame by frame and encodes the film to out/
 // Usage: node render.mjs [--fps 60] [--workers 3] [--from 0 --to 103.2]
 import { createRequire } from "node:module";
 import { spawn } from "node:child_process";
@@ -9,14 +9,15 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const { chromium } = createRequire(import.meta.url)("playwright");
 const here = dirname(fileURLToPath(import.meta.url));
 const arg = (k, d) => { const i = process.argv.indexOf("--" + k); return i > 0 ? process.argv[i + 1] : d; };
-const TL = createRequire(import.meta.url)("./src/timeline.js");
+const SHORT = process.argv.includes("--short");
+const TL = createRequire(import.meta.url)(SHORT ? "./src/short-timeline.js" : "./src/timeline.js");
 const FPS = +arg("fps", 60), WORKERS = +arg("workers", 3);
 const FROM = +arg("from", 0), TO = +arg("to", TL.DURATION);
 const OUT = join(here, "out"), SEG = join(OUT, "seg");
 mkdirSync(SEG, { recursive: true });
 const total = Math.round((TO - FROM) * FPS);
 const per = Math.ceil(total / WORKERS);
-const url = pathToFileURL(join(here, "src/index.html")).href;
+const url = pathToFileURL(join(here, SHORT ? "src/short.html" : "src/index.html")).href;
 
 const run = (cmd, args, opts = {}) => new Promise((res, rej) => {
   const p = spawn(cmd, args, { stdio: ["pipe", "inherit", "inherit"], ...opts });
@@ -58,9 +59,9 @@ await browser.close();
 console.log(`\nframes done in ${Math.round((Date.now() - started) / 1000)}s`);
 
 writeFileSync(join(SEG, "list.txt"), segs.map((s) => `file '${s}'`).join("\n"));
-const wav = join(OUT, "soundtrack.wav");
-if (!existsSync(wav)) await run("node", [join(here, "audio.mjs")]);
-const final = join(OUT, FROM === 0 && TO === TL.DURATION ? "hai-pantai-launch.mp4" : `preview-${FROM}-${TO}.mp4`);
+const wav = join(OUT, SHORT ? "soundtrack-30s.wav" : "soundtrack.wav");
+if (!existsSync(wav)) await run("node", [join(here, "audio.mjs"), ...(SHORT ? ["--short"] : [])]);
+const final = join(OUT, FROM === 0 && TO === TL.DURATION ? (SHORT ? "hai-pantai-30s.mp4" : "hai-pantai-launch.mp4") : `preview-${FROM}-${TO}.mp4`);
 await run("ffmpeg", ["-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", join(SEG, "list.txt"),
   "-ss", String(FROM), "-t", String(TO - FROM), "-i", wav,
   "-map", "0:v", "-map", "1:a", "-c:v", "copy",

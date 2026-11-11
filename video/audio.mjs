@@ -7,7 +7,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const TL = createRequire(import.meta.url)("./src/timeline.js");
+const SHORT = process.argv.includes("--short");
+const TL = createRequire(import.meta.url)(SHORT ? "./src/short-timeline.js" : "./src/timeline.js");
 const SR = 48000, DUR = TL.DURATION + 1.0, N = Math.ceil(DUR * SR);
 const { BEAT, BAR, S } = TL;
 const L = new Float32Array(N), R = new Float32Array(N);       // dry
@@ -38,6 +39,7 @@ const hpf = (k) => { let y = 0; return (x) => x - (y += k * (x - y)); };
 const bars = Math.ceil(TL.DURATION / BAR);
 const CHORDS = [[50, 54, 57, 62], [45, 52, 57, 61], [47, 54, 59, 62], [43, 50, 55, 59]]; // D A Bm G
 const ROOTS = [38, 33, 35, 31];
+const bp = (t) => Math.min(1, Math.max(0, (t - S.problem) / (S.logo - S.problem)));
 const sec = (t) => (t < S.problem ? "cold" : t < S.logo ? "build" : t < S.tech ? "groove" : t < S.finale ? "tech" : t < S.end - 2.4 ? "finale" : "outro");
 
 // Kick first, so the sidechain exists before other parts are rendered.
@@ -55,7 +57,7 @@ for (let b = 0; b < bars; b++) {
   const t = b * BAR, s = sec(t);
   if (s === "outro") continue;
   const ch = CHORDS[b % 4];
-  const cut = s === "cold" ? 0.018 : s === "build" ? 0.02 + 0.04 * ((b - 4) / 4) : s === "tech" ? 0.025 : 0.06;
+  const cut = s === "cold" ? 0.018 : s === "build" ? 0.02 + 0.04 * bp(t) : s === "tech" ? 0.025 : 0.06;
   const g = s === "cold" ? 0.05 : s === "build" ? 0.06 : 0.055;
   ch.forEach((m, j) => {
     const f = mtof(m + 12);
@@ -75,12 +77,12 @@ CHORDS[0].concat([66, 69]).forEach((m, j) => { const f = mtof(m + 12), f1 = lp(0
 const BASS = [1, 0, 0, 1, 1, 0, 1, 0];
 for (let b = 0; b < bars; b++) for (let e = 0; e < 8; e++) {
   const t = b * BAR + e * BEAT / 2, s = sec(t);
-  const build = s === "build" && b >= 5;
+  const build = s === "build" && bp(t) >= 0.25;
   if (!(s === "groove" || s === "finale" || s === "tech" || build)) continue;
   if (!build && !BASS[e]) continue;
   if (t > S.logo - 0.35 && t < S.logo) continue; // silence before the drop
   const f = mtof(ROOTS[b % 4] + (e === 6 ? 7 : 0));
-  add(t, 0.32, (u) => { const v = Math.sin(TAU * f * u) + 0.3 * Math.sin(TAU * 2 * f * u); return Math.tanh(v * 1.4) * Math.exp(-u * 7) * Math.min(1, u / 0.004); }, { gain: build ? 0.16 * ((b - 4) / 4) : 0.26, ducked: true });
+  add(t, 0.32, (u) => { const v = Math.sin(TAU * f * u) + 0.3 * Math.sin(TAU * 2 * f * u); return Math.tanh(v * 1.4) * Math.exp(-u * 7) * Math.min(1, u / 0.004); }, { gain: build ? 0.16 * bp(t) : 0.26, ducked: true });
 }
 
 // Pluck arp (marimba-ish)
@@ -179,5 +181,5 @@ for (let s = 0; s < N; s++) {
   buf.writeInt16LE(Math.round(Math.tanh(R[s] * pre) * 0.89 * f * 32767), 46 + s * 4);
 }
 mkdirSync(join(here, "out"), { recursive: true });
-writeFileSync(join(here, "out/soundtrack.wav"), buf);
+writeFileSync(join(here, SHORT ? "out/soundtrack-30s.wav" : "out/soundtrack.wav"), buf);
 console.log("soundtrack", DUR.toFixed(1) + "s", "peak", peak.toFixed(2));

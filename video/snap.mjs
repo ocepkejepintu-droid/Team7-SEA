@@ -14,7 +14,7 @@ const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 const errs = [];
 page.on("pageerror", (e) => errs.push(String(e)));
 page.on("console", (m) => { if (m.type() === "error") errs.push(m.text()); });
-await page.goto(pathToFileURL(join(here, "src/index.html")).href);
+await page.goto(pathToFileURL(join(here, process.env.PAGE || "src/index.html")).href);
 await page.evaluate(() => window.ready);
 for (const t of ts) {
   await page.evaluate((t) => window.renderFrame(t), +t);
