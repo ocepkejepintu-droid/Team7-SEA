@@ -43,7 +43,7 @@ const MAJ = [[50, 54, 57, 62], [45, 52, 57, 61], [47, 54, 59, 62], [43, 50, 55, 
 const MAJR = [38, 33, 35, 31];
 const MIN = [[50, 53, 57, 62], [46, 50, 53, 58], [45, 48, 53, 57], [48, 52, 55, 60]]; // Dm Bb F C
 const MINR = [38, 34, 41, 36];
-const level = (t) => (t < S.swarm ? 0 : t < S.agents ? 1 : t < S.humans ? 2 : t < S.github ? 3 : 4); // build intensity
+const level = (t) => (t < S.swarm ? 0 : t < S.agents ? 1 : t < S.humans ? 2 : t < S.github ? 3 : 4); // github and film are the peak // build intensity
 
 function kick(t, g = 1) {
   add(t, 0.5, (u) => Math.sin(TAU * (45 * u + (95 / 28) * (1 - Math.exp(-u * 28)))) * Math.exp(-u * 6.5), { gain: 0.62 * g });
@@ -61,17 +61,17 @@ for (let q = 0; q < 6; q++) {
 [50, 53, 57, 62].forEach((m, j) => { const f = mtof(m), f1 = lp(0.02), f2 = lp(0.02); add(0, 3.0, (u) => f2(f1(saw(f, u) + saw(f * 1.004, u))) * Math.min(1, u / 0.8) * (u > 2.7 ? (3 - u) / 0.3 : 1), { gain: 0.05, pan: (j - 1.5) * 0.4, send: 0.6 }); });
 
 // ---------- product: tropical house in D major ----------
-for (let b = 0; b < 3; b++) {
-  const t0 = S.product + b * BAR, ch = MAJ[b % 4];
+for (let b = 0; S.product + b * BAR < S.rewind; b++) {
+  const t0 = S.product + b * BAR, ch = MAJ[b % 4], cut = S.rewind - t0;
   ch.forEach((m, j) => {
     const f = mtof(m + 12), f1 = lp(0.06), f2 = lp(0.06);
-    add(t0, BAR + 0.2, (u) => { let v = 0; for (const d of [-0.11, 0, 0.13]) v += saw(f * (1 + d / 100 * 6), u); return f2(f1(v)) * Math.min(1, u / 0.2) * (u > BAR ? Math.max(0, 1 - (u - BAR) / 0.2) : 1); },
+    add(t0, Math.min(BAR + 0.2, cut), (u) => { let v = 0; for (const d of [-0.11, 0, 0.13]) v += saw(f * (1 + d / 100 * 6), u); return f2(f1(v)) * Math.min(1, u / 0.2) * (u > BAR ? Math.max(0, 1 - (u - BAR) / 0.2) : 1); },
       { gain: 0.05, pan: (j - 1.5) * 0.35, send: 0.5, ducked: true });
   });
-  for (let q = 0; q < 4; q++) { const t = t0 + q * BEAT; kick(t); if (q % 2) clap(t); }
-  for (let x = 0; x < 16; x++) hat(t0 + x * BEAT / 4, x % 4 === 2 ? 1 : x % 2 ? 0.45 : 0.6);
+  for (let q = 0; q < 4 && q * BEAT < cut; q++) { const t = t0 + q * BEAT; kick(t); if (q % 2) clap(t); }
+  for (let x = 0; x < 16 && x * BEAT / 4 < cut; x++) hat(t0 + x * BEAT / 4, x % 4 === 2 ? 1 : x % 2 ? 0.45 : 0.6);
   const BASS = [1, 0, 0, 1, 1, 0, 1, 0], ARP = [0, 1, 2, 3, 2, 1, 2, 3];
-  for (let e = 0; e < 8; e++) {
+  for (let e = 0; e < 8 && e * BEAT / 2 < cut; e++) {
     const t = t0 + e * BEAT / 2;
     if (BASS[e]) { const f = mtof(MAJR[b % 4] + (e === 6 ? 7 : 0)); add(t, 0.3, (u) => Math.tanh((Math.sin(TAU * f * u) + 0.3 * Math.sin(TAU * 2 * f * u)) * 1.4) * Math.exp(-u * 7) * Math.min(1, u / 0.004), { gain: 0.26, ducked: true }); }
     const f = mtof(ch[ARP[e]] + 24), f1 = lp(0.5);
@@ -110,7 +110,7 @@ for (let b = 0; b < bBars; b++) {
   }
 }
 // snare roll into the finale
-for (let i = 0; i < 16; i++) { const t = S.github + 1.25 + 1.5 * (1 - Math.pow(1 - i / 16, 1.6)); if (t < BUILD[1]) clap(t, 0.25 + i * 0.04); }
+for (let i = 0; i < 16; i++) { const t = S.finale - 1.75 + 1.5 * (1 - Math.pow(1 - i / 16, 1.6)); if (t < BUILD[1]) clap(t, 0.25 + i * 0.04); }
 
 // ---------- finale: D major blooms, bell melody ----------
 [38, 50, 54, 57, 62, 66, 69, 74].forEach((m, j) => {

@@ -3,12 +3,13 @@
 const S = TL.S;
 const world = $("#world");
 const SC = [];
-function addScene(name, t0, t1, build, update, { pre = 0, post = 0 } = {}) {
+function addScene(name, _t0, _t1, build, update, { pre = 0, post = 0 } = {}) {
+  const seg = TL.segOf(name), t0 = seg.t0, t1 = seg.t1, speed = seg.speed;
   const root = document.createElement("div");
   root.className = "scene"; root.dataset.name = name;
   world.appendChild(root);
   build(root);
-  SC.push({ name, t0, t1, pre, post, root, update });
+  SC.push({ name, t0, t1, pre, post, root, update, speed });
 }
 
 // ---------- shared bits ----------
@@ -38,30 +39,32 @@ addScene("hook", S.hook, S.product, (root) => {
   root.innerHTML = `
     <div class="abs" id="hk-all" style="inset:0;transform-origin:540px 900px">
       <div class="deep-bg"></div><div class="gridlines"></div>
-      <svg class="abs" style="left:-80px;top:1170px;width:1240px;height:771px" viewBox="0 0 ${GW} ${GH}">
+      <svg class="abs" style="left:-40px;top:1280px;width:1160px;height:721px" viewBox="0 0 ${GW} ${GH}">
         <path d="${LAND_D}" fill="#0b3d42"/>
         <g id="hk-coast" fill="none" stroke="#5eead4" stroke-width="3.5" stroke-linecap="round" opacity=".75">${COASTS}</g>
         <g id="hk-dots">${dots}</g>
       </svg>
-      <div class="abs" style="left:0;right:0;top:0;height:1300px;background:linear-gradient(#021012 55%, rgba(2,16,18,0))"></div>
-      <div class="abs" style="left:80px;top:280px;width:940px">
-        <div class="hl white" id="hk1" style="font-size:172px">One hour.</div>
-        <div class="hl white" id="hk2" style="font-size:172px;margin-top:4px">One game.</div>
-        <div class="hl white" id="hk3" style="font-size:112px;margin-top:26px">For Bali’s <span class="coral">trash.</span></div>
+      <div class="abs" style="left:0;right:0;top:0;height:1400px;background:linear-gradient(#021012 60%, rgba(2,16,18,0))"></div>
+      <div class="abs" style="left:80px;top:250px;width:940px">
+        <div class="hl white" id="hk1" style="font-size:164px">One hour.</div>
+        <div class="hl white" id="hk2" style="font-size:164px;margin-top:2px">One game.</div>
+        <div class="hl white" id="hk4" style="font-size:164px;margin-top:2px">One <span class="sun">film.</span></div>
+        <div class="hl white" id="hk3" style="font-size:96px;margin-top:26px">For Bali’s <span class="coral">trash.</span></div>
       </div>
-      <div class="abs" id="hk-tw" style="left:0;right:0;top:900px;text-align:center;transform-origin:540px 150px">
+      <div class="abs" id="hk-tw" style="left:0;right:0;top:1000px;text-align:center;transform-origin:540px 150px">
         <div class="eb coral" style="display:inline-flex;align-items:center;gap:16px"><i id="hk-rec" style="display:block;width:22px;height:22px;border-radius:50%;background:var(--coral);box-shadow:0 0 20px var(--coral)"></i>The clock starts now</div>
         <div class="mono" id="hk-timer" style="font-weight:800;font-size:250px;line-height:1.05;color:var(--sun);letter-spacing:-0.05em;margin-top:6px;text-shadow:0 0 70px rgba(255,210,122,.4)">60:00</div>
       </div>
     </div>
     <div class="abs" id="hk-flash" style="inset:0;background:#fff;opacity:0"></div>`;
-  ["#hk1", "#hk2", "#hk3"].forEach((s) => split($(s, root)));
+  ["#hk1", "#hk2", "#hk3", "#hk4"].forEach((s) => split($(s, root)));
   root.__coast = $$("#hk-coast path", root);
   root.__dots = $$("#hk-dots circle", root);
 }, (u, root) => {
   rise($("#hk1", root), u, 0.08, { dist: 200, stagger: 0.06 });
-  rise($("#hk2", root), u, 0.58, { dist: 200, stagger: 0.06 });
-  rise($("#hk3", root), u, 1.08, { dist: 150, stagger: 0.05 });
+  rise($("#hk2", root), u, 0.48, { dist: 200, stagger: 0.06 });
+  rise($("#hk4", root), u, 0.88, { dist: 200, stagger: 0.06 });
+  rise($("#hk3", root), u, 1.28, { dist: 130, stagger: 0.05 });
   root.__coast.forEach((p, i) => draw(p, ease(u, 0.05 + (i % 40) * 0.012, 1.0 + (i % 40) * 0.012, E.inOutCubic)));
   root.__dots.forEach((c, i) => { const a = 0.35 + i * 0.045; const k = u < a ? 0 : spring(u - a, 16, 7); const v = (k * 11).toFixed(2); if (c.__r !== v) { c.setAttribute("r", v); c.__r = v; } });
   // the clock: appears on 1.6, ticks on every eighth note from 2.0
@@ -246,7 +249,7 @@ addScene("rewind", S.rewind, S.master, (root) => {
         <div class="abs" id="rw-c0" style="left:0;right:0;top:0;font-weight:1000;font-size:310px;letter-spacing:-0.05em;line-height:1;color:#fff">How?</div>
       </div>
       <div class="abs mono" id="rw-clock" style="left:0;right:0;top:1040px;text-align:center;font-weight:800;font-size:150px;color:var(--sun);letter-spacing:-0.04em;text-shadow:0 0 50px rgba(255,210,122,.4)">16:09:36</div>
-      <div class="abs body" id="rw-sub" style="left:0;right:0;top:1220px;text-align:center;color:rgba(255,255,255,.72);font-size:42px">Rewind to the first commit.</div>
+      <div class="abs body" id="rw-sub" style="left:0;right:0;top:1220px;text-align:center;color:rgba(255,255,255,.72);font-size:42px">Rewind to the first line of code.</div>
     </div>
     <div class="scanlines"></div>`;
 }, (v, root) => {
@@ -286,9 +289,10 @@ addScene("master", S.master, S.swarm, (root) => {
       </div>
       <div class="mono" style="margin-top:32px;padding:24px 28px;border-radius:24px;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.08);font-size:33px;line-height:1.5;color:#fff;height:154px">
         <div><span id="ms-p1"></span><span class="ms-cur" id="ms-c1">▌</span></div><div class="sun"><span id="ms-p2"></span><span class="ms-cur" id="ms-c2">▌</span></div></div>
-      <div class="mono" id="ms-pl" style="margin-top:30px;font-size:22px;letter-spacing:.14em;color:var(--teal-glow)">PLAN · 10 TASKS → OPUS 5.5 EXECUTORS</div>
+      <div class="mono" id="ms-pl" style="margin-top:30px;font-size:22px;letter-spacing:.14em;color:var(--teal-glow)">PLAN · 10 TASKS + A FILM → OPUS 5.5</div>
       <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px">
         ${TASKS.map((t) => `<div class="mono ms-t" style="display:flex;align-items:center;gap:12px;font-size:24px;font-weight:600;color:#fff;padding:13px 16px;border-radius:16px;background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.28);white-space:nowrap"><b style="color:var(--teal-glow)">→</b>${t}</div>`).join("")}
+        <div class="mono ms-t" style="grid-column:1 / span 2;display:flex;align-items:center;gap:12px;font-size:24px;font-weight:700;color:var(--sun);padding:13px 16px;border-radius:16px;background:rgba(255,210,122,.1);border:1px solid rgba(255,210,122,.4);white-space:nowrap"><b>→</b>Launch film · its own session</div>
       </div>
     </div>`;
   split($("#ms-h", root));
@@ -298,16 +302,16 @@ addScene("master", S.master, S.swarm, (root) => {
   tf($("#ms-eb", root), { o: Math.min(ease(m, 0, 0.3), 1 - ease(m, 2.2, 2.4)) });
   const ck = m < 0.05 ? 0 : spring(m - 0.05, 10, 8);
   // exit: the card collapses into the master node of the swarm
-  const xk = ease(m, 2.12, 2.5, E.inCubic);
+  const xk = ease(m, 2.22, 2.5, E.inCubic);
   tf($("#ms-card", root), { y: (1 - ck) * 300 + xk * 160, s: (0.92 + 0.08 * ck) * (1 - xk * 0.88), o: clamp(m * 6) * (1 - xk * xk), origin: "50% 50%" });
   tf($("#ms-orb", root), { s: 1 + 0.08 * Math.sin(m * 9) });
-  const P1 = "› Build a game for Bali’s trash.", P2 = "› Ship it in one hour.";
+  const P1 = "› Build a game for Bali’s trash.", P2 = "› And its launch film. 1 hour.";
   const n1 = Math.floor(clamp((m - 0.28) / 0.6) * P1.length), n2 = Math.floor(clamp((m - 0.9) / 0.4) * P2.length);
   txt($("#ms-p1", root), P1.slice(0, n1)); txt($("#ms-p2", root), P2.slice(0, n2));
   const blink = Math.sin(m * 18) > 0 ? 1 : 0;
   op($("#ms-c1", root), m < 0.9 ? blink : 0); op($("#ms-c2", root), m >= 0.9 && m < 1.8 ? blink : 0);
   op($("#ms-pl", root), ease(m, 1.2, 1.35));
-  root.__tasks.forEach((el, i) => { const a = 1.3 + i * 0.075; const k = m < a ? 0 : spring(m - a, 16, 8); tf(el, { x: (1 - k) * (i % 2 ? 60 : -60), s: 0.9 + 0.1 * k, o: clamp(k * 3) }); });
+  root.__tasks.forEach((el, i) => { const a = 1.3 + i * 0.055; const k = m < a ? 0 : spring(m - a, 16, 8); tf(el, { x: (1 - k) * (i % 2 ? 60 : -60), s: 0.9 + 0.1 * k, o: clamp(k * 3) }); });
 });
 
 // =====================================================================
@@ -570,10 +574,7 @@ addScene("humans", S.humans, S.github, (root) => {
     css(d, "borderColor", g >= land ? "#fff7d6" : "#5eead4");
     tf(d, { s: 1 + fl * 0.45 + act * 0.05 });
   });
-  // out
-  const out = ease(g, 3.15, 3.5, E.inCubic);
-  tf($("#hu-all", root), { y: -out * 160, o: 1 - out });
-});
+}, { pre: 0.32 });
 
 // =====================================================================
 // 8. GITHUB  24.5–27.5 s: the real commit feed and the hour, minute by minute
@@ -595,12 +596,12 @@ addScene("github", S.github, S.finale, (root) => {
         </div>
       </div>
       <div class="abs" id="gh-gw" style="left:50px;top:1336px;width:980px;height:200px">
-        <div class="mono" style="font-size:21px;letter-spacing:.14em;color:#7d8590;display:flex;justify-content:space-between"><span>THE HOUR, MINUTE BY MINUTE</span><span>15:10 → 16:10</span></div>
+        <div class="mono" style="font-size:21px;letter-spacing:.14em;color:#7d8590;display:flex;justify-content:space-between"><span>THE HOUR, MINUTE BY MINUTE</span><span>15:14 → 16:15</span></div>
         ${[...Array(60)].map((_, m) => `<div class="cell" style="left:${(m % 20) * 49}px;top:${44 + Math.floor(m / 20) * 49}px"></div>`).join("")}
       </div>
     </div>`;
   root.__rows = $$(".gh-row", root); root.__cells = $$(".cell", root);
-  root.__min = TL.COMMITS.map((c) => Math.min(59, Math.floor((c.sec - TL.COMMITS[0].sec) / 60)));
+  root.__min = TL.COMMITS.map((c) => Math.min(59, Math.floor((c.sec - TL.START) / 60)));
 }, (k, root, t) => {
   // entry: wipe up from the bottom
   const wk = ease(k, -0.35, 0, E.inOutCubic);
@@ -626,7 +627,7 @@ addScene("github", S.github, S.finale, (root) => {
   // the minute grid
   const counts = new Array(60).fill(0), last = new Array(60).fill(-9);
   C.forEach((c, i) => { if (arrived[i]) { counts[root.__min[i]]++; last[root.__min[i]] = Math.max(last[root.__min[i]], c.t); } });
-  const nowM = Math.min(59, Math.floor((clk - C[0].sec) / 60));
+  const nowM = Math.min(59, Math.floor((clk - TL.START) / 60));
   root.__cells.forEach((cell, m) => {
     const intro = ease(k, 0.1 + m * 0.006, 0.4 + m * 0.006);
     const pop = last[m] > S.github ? Math.exp(-(t - last[m]) * 6) : 0;
@@ -635,6 +636,65 @@ addScene("github", S.github, S.finale, (root) => {
     tf(cell, { s: (0.6 + 0.4 * intro) * (1 + pop * 0.35), o: intro });
   });
   tf($("#gh-feed", root), { y: (1 - ease(k, 0, 0.4)) * 80, o: ease(k, 0, 0.3) });
+}, { pre: 0.3 });
+
+// =====================================================================
+// 8b. FILM  another session writes the launch film, in code, inside the hour
+// =====================================================================
+const CLIPS = [["Open", 9], ["Problem", 10], ["Logo", 7], ["Loop", 5], ["Report", 14], ["Clean", 15], ["Compete", 14], ["Reuse", 10], ["Game", 9], ["Hood", 10], ["Finale", 10]];
+const CLIP_COL = ["#0b6b68", "#0e9f9a", "#f59e0b", "#5eead4", "#ff6b4a", "#22c55e", "#a371f7", "#ffd27a", "#0e9f9a", "#1d8aa7", "#f59e0b"];
+addScene("film", S.film, S.finale, (root) => {
+  const total = CLIPS.reduce((a, c) => a + c[1], 0);
+  let x = 0;
+  const clips = CLIPS.map(([n, d], i) => { const w = d / total * 940, el = `<div class="abs fm-clip" style="left:${x.toFixed(1)}px;top:0;width:${(w - 3).toFixed(1)}px;height:66px;border-radius:10px;background:${CLIP_COL[i]};overflow:hidden;padding:8px 8px 0;font-weight:900;font-size:17px;color:rgba(0,0,0,.72);white-space:nowrap;transform-origin:0 50%">${n}</div>`; x += w; return el; }).join("");
+  const r = rng(21);
+  const bars = [...Array(118)].map((_, i) => { const a = 0.25 + 0.75 * Math.abs(Math.sin(i * 0.37) * 0.6 + (r() - 0.5) * 0.7); return `<div class="abs fm-w" style="left:${(i * 8).toFixed(0)}px;bottom:${(27 - a * 26).toFixed(1)}px;width:5px;height:${(a * 52).toFixed(1)}px;border-radius:3px;background:#5eead4"></div>`; }).join("");
+  root.innerHTML = `
+    <div class="deep-bg"></div><div class="gridlines"></div>
+    <div class="abs" style="left:80px;top:290px;width:920px">
+      <div class="eb sun" id="fm-eb">06 · Another session</div>
+      <div class="hl white" id="fm-h" style="margin-top:20px">It made the<br><span class="sun">launch film.</span></div>
+    </div>
+    <div class="panel" id="fm-p" style="left:50px;top:560px;width:980px;height:640px;border-color:rgba(255,210,122,.35)">
+      <div class="ph mono"><div class="ag"><span style="color:var(--sun)">●</span>session · motion video · Opus 5.5</div><div class="st" id="fm-st">writing scenes</div></div>
+      <div class="abs" style="left:20px;top:84px;width:940px;height:529px;border-radius:20px;overflow:hidden;background:#000">
+        ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => `<img class="abs fm-img" src="../assets/film/f${i}.jpg" style="left:0;top:0;width:940px;height:529px;object-fit:cover;opacity:0" alt="">`).join("")}
+        <div class="abs mono" style="left:16px;bottom:14px;background:rgba(0,0,0,.6);color:#fff;font-size:22px;font-weight:700;padding:6px 12px;border-radius:10px">▶ <span id="fm-tc">0:00</span> / 1:53</div>
+        <div class="abs mono" style="right:16px;top:14px;background:rgba(0,0,0,.6);color:var(--sun);font-size:20px;font-weight:700;padding:6px 12px;border-radius:10px">1920×1080 · 60 fps</div>
+      </div>
+    </div>
+    <div class="panel" id="fm-tl" style="left:50px;top:1222px;width:980px;height:262px;border-color:rgba(255,210,122,.25)">
+      <div class="abs mono" style="left:20px;right:20px;top:14px;display:flex;justify-content:space-between;font-size:18px;color:rgba(255,255,255,.45)"><span>0:00</span><span>0:30</span><span>1:00</span><span>1:30</span><span>1:53</span></div>
+      <div class="abs" style="left:20px;top:48px;width:940px;height:66px">${clips}</div>
+      <div class="abs" style="left:20px;top:130px;width:940px;height:56px;overflow:hidden" id="fm-wave">${bars}</div>
+      <div class="abs mono" style="left:20px;top:200px;font-size:21px;color:rgba(255,255,255,.6)"><span style="color:var(--teal-glow)">V1</span> scenes · <span style="color:var(--teal-glow)">A1</span> synthesized score · every frame made in code</div>
+      <div class="abs" id="fm-ph" style="left:20px;top:40px;width:4px;height:152px;background:var(--sun);box-shadow:0 0 14px var(--sun);border-radius:2px"></div>
+    </div>`;
+  split($("#fm-h", root));
+  root.__img = $$(".fm-img", root); root.__clips = $$(".fm-clip", root); root.__w = $$(".fm-w", root);
+}, (f, root, t) => {
+  rise($("#fm-h", root), f, 0.02, { dist: 110, stagger: 0.05 });
+  op($("#fm-eb", root), ease(f, 0, 0.3));
+  const pk = f < 0 ? 0 : spring(f, 10, 8);
+  tf($("#fm-p", root), { y: (1 - pk) * 260, o: clamp(pk * 3) });
+  const tk = f < 0.15 ? 0 : spring(f - 0.15, 10, 8);
+  tf($("#fm-tl", root), { y: (1 - tk) * 200, o: clamp(tk * 3) });
+  // clips land one by one, then the playhead plays the cut
+  root.__clips.forEach((c, i) => { const k = f < 0.35 + i * 0.09 ? 0 : spring(f - 0.35 - i * 0.09, 18, 8); tf(c, { sx: k, o: clamp(k * 4) }); });
+  const p = ease(f, 0.45, 2.6, E.inOutSine);
+  root.__w.forEach((w, i) => op(w, i / 118 < ease(f, 0.4, 1.6) ? 1 : 0.08));
+  tf($("#fm-ph", root), { x: p * 936, o: ease(f, 0.4, 0.55) });
+  const fi = Math.min(8.999, p * 9), cur = Math.floor(fi), blend = clamp((fi - cur - 0.82) / 0.18);
+  root.__img.forEach((im, i) => {
+    const o = i === cur ? 1 : i === cur + 1 ? blend : 0;
+    tf(im, { s: 1.06 - 0.06 * (fi - cur), o });
+  });
+  const sec = Math.round(p * 113);
+  txt($("#fm-tc", root), `${Math.floor(sec / 60)}:${pad2(sec % 60)}`);
+  const film = TL.COMMITS.find((c) => c.hash === "e52f791");
+  const st = $("#fm-st", root), ok = t >= film.t;
+  txt(st, ok ? "committed ✓ e52f791" : "writing scenes" + ".".repeat(1 + Math.floor(f * 6) % 3));
+  st.classList.toggle("ok", ok);
 });
 
 // =====================================================================
@@ -649,14 +709,14 @@ addScene("finale", S.finale, S.end, (root) => {
     </svg>
     <div class="abs" style="left:0;right:0;top:0;height:1300px;background:linear-gradient(#021012 50%, rgba(2,16,18,0))"></div>
     <div class="abs" id="fi-lock" style="inset:0">
-      <div class="abs" style="left:0;right:0;top:330px;text-align:center"><div class="eb sun" id="fi-eb">Shipped · 16:09 WITA</div></div>
+      <div class="abs" style="left:0;right:0;top:330px;text-align:center"><div class="eb sun" id="fi-eb">Shipped · 16:15 WITA</div></div>
       <div class="abs" id="fi-markw" style="left:445px;top:395px;width:190px;height:190px">${markSVG("fm")}</div>
       <div class="abs" id="fi-word" style="left:0;right:0;top:610px;text-align:center;font-weight:1000;font-size:168px;letter-spacing:-0.05em;line-height:1;color:#fff">Hai Pantai</div>
-      <div class="abs" id="fi-built" style="left:0;right:0;top:806px;text-align:center;font-weight:1000;font-size:72px;letter-spacing:-0.035em;color:var(--sun)">Built in 59 minutes.</div>
+      <div class="abs" id="fi-built" style="left:0;right:0;top:806px;text-align:center;font-weight:1000;font-size:72px;letter-spacing:-0.035em;color:var(--sun)">Game + film in ~1 hour.</div>
       <div class="abs" style="left:60px;right:60px;top:950px;display:flex;gap:18px">
         <div class="stat fi-s"><div class="n" style="color:var(--sun)">1</div><div class="l">Fable 5.2<br>master</div></div>
         <div class="stat fi-s"><div class="n" style="color:var(--teal-glow)">50+</div><div class="l">Opus 5.5<br>sessions</div></div>
-        <div class="stat fi-s"><div class="n" style="color:#a371f7">29</div><div class="l">commits<br>5 PRs merged</div></div>
+        <div class="stat fi-s"><div class="n" style="color:#a371f7">${TL.COMMITS.length}</div><div class="l">commits<br>5 PRs merged</div></div>
       </div>
       <div class="abs" id="fi-tag" style="left:0;right:0;top:1240px;text-align:center;font-weight:900;font-size:46px;color:rgba(255,255,255,.85)">Bali’s coast is the <span class="glow">scoreboard.</span></div>
       <div class="abs" id="fi-foot" style="left:0;right:0;top:1400px;text-align:center;color:rgba(255,255,255,.6)">
@@ -695,20 +755,23 @@ addScene("finale", S.finale, S.end, (root) => {
 
 // ---------- HUD and commit ticker ----------
 const hud = $("#hud"), ticker = $("#ticker");
-hud.innerHTML = `<div class="row"><div class="live"><i class="dot" id="hud-dot"></i>LIVE BUILD</div><div class="clock mono"><span id="hud-clock">15:10:07</span><small>WITA</small></div></div>
+hud.innerHTML = `<div class="row"><div class="live"><i class="dot" id="hud-dot"></i>LIVE BUILD <span class="mono" id="hud-el" style="color:var(--teal-glow);letter-spacing:0;font-size:30px;margin-left:6px">T+00:00</span></div><div class="clock mono"><span id="hud-clock">15:10:07</span><small>WITA</small></div></div>
   <div class="track"><div class="fill" id="hud-fill"></div></div><div class="tlabel mono" id="hud-t" style="display:none"></div>`;
 ticker.innerHTML = [0, 1].map(() => `<div class="tk mono">${COMMIT_ICO}<span class="h"></span><span class="m"></span><span class="w"></span></div>`).join("");
 const tks = $$(".tk", ticker);
 const setTk = (el, c) => { txt($(".h", el), c ? c.hash : ""); txt($(".m", el), c ? c.msg : ""); txt($(".w", el), c ? c.wita.slice(0, 5) : ""); };
 function updateHud(t) {
-  const hv = env(t, 10.28, 28.15, 0.3, 0.35);
-  tf(hud, { y: (1 - E.outCubic(prog(t, 10.28, 10.6))) * -40, o: hv });
+  const hv = env(t, S.master - 0.22, 28.15, 0.3, 0.35);
+  tf(hud, { y: (1 - E.outCubic(prog(t, S.master - 0.22, S.master + 0.1))) * -40, o: hv });
   const c = TL.clockAt(t);
   txt($("#hud-clock"), fmtClock(c));
-  css($("#hud-fill"), "width", (clamp((c - 607) / 3600) * 100).toFixed(2) + "%");
+  css($("#hud-fill"), "width", (clamp((c - TL.START) / 3600) * 100).toFixed(2) + "%");
+  const el = Math.max(0, Math.floor(c - TL.START));
+  txt($("#hud-el"), `T+${pad2(Math.floor(el / 60))}:${pad2(el % 60)}`);
+  css($("#hud-el"), "color", el >= 3600 ? "var(--sun)" : "var(--teal-glow)");
   op($("#hud-dot"), Math.sin(t * 6) > -0.3 ? 1 : 0.3);
   // ticker: newest commit slides in, the previous slides out
-  const tv = env(t, 10.6, S.github - 0.05, 0.3, 0.3);
+  const tv = Math.max(env(t, S.master + 0.1, S.github - 0.05, 0.3, 0.3), env(t, S.film + 0.15, S.finale, 0.3, 0.05));
   op(ticker, tv);
   if (tv <= 0) return;
   let i = -1;
@@ -729,7 +792,7 @@ window.renderFrame = (t) => {
   for (const sc of SC) {
     const on = t >= sc.t0 - sc.pre && t < sc.t1 + sc.post;
     css(sc.root, "visibility", on ? "visible" : "hidden");
-    if (on) sc.update(t - sc.t0, sc.root, t);
+    if (on) sc.update((t - sc.t0) * sc.speed, sc.root, t);
   }
   updateHud(t);
   let sx = 0, sy = 0;
