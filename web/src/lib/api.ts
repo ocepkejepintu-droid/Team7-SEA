@@ -25,8 +25,9 @@ export const api = {
   join: (nickname: string, avatar: string) => call<{ player: Player; token: string }>("players", { nickname, avatar }),
   state: () => call<GameState>("state"),
   /** photo: base64 JPEG without the data: prefix */
-  tag: (photo: string) => call<Tag>("ai/tag", { photo }),
+  /** `lang`: the language Claude should write its summary in */
+  tag: (photo: string, lang: string) => call<Tag>("ai/tag", { photo, lang }),
   report: (r: { lng: number; lat: number; photo: string; type: TrashType; size: Size; note?: string }) => call<ReportResult>("reports", r),
-  clean: (id: string, photo: string) => call<CleanResult>(`reports/${id}/clean`, { photo }),
+  clean: (id: string, photo: string, lang: string) => call<CleanResult>(`reports/${id}/clean`, { photo, lang }),
   photoUrl: (photo: string) => `api/photos/${photo}`,
 };

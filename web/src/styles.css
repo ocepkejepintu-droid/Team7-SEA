@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Hai Pantai: ocean teal, sand and coral. Rounded and playful. Light only. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Hai Pantai: ocean teal, sand and coral. Rounded and playful. Light and dark: lib/theme.ts sets data-theme on <html>. */
 :root {
   --radius: 1rem;
   --background: #ffffff;
@@ -37,6 +39,34 @@
   --amber-ink: #92400e;
   --sea: #cfe9ea;
   color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --background: #0a1c21;
+  --foreground: #e6f1f1;
+  --card: #12292f;
+  --card-foreground: #e6f1f1;
+  --popover: #12292f;
+  --popover-foreground: #e6f1f1;
+  --secondary: #123f42;
+  --secondary-foreground: #7fe0db;
+  --muted: #1b363d;
+  --muted-foreground: #9db4b8;
+  --accent: #123f42;
+  --accent-foreground: #7fe0db;
+  --border: #27454c;
+  --input: #27454c;
+  --canvas: #0a1c21;
+  --brand-ink: #7fe0db;
+  --brand-soft: #123f42;
+  --coral-soft: #4a211a;
+  --coral-ink: #ffb4a3;
+  --good-soft: #123b24;
+  --good-ink: #86efac;
+  --amber-soft: #45330b;
+  --amber-ink: #fcd34d;
+  --sea: #0d3a45;
+  color-scheme: dark;
 }
 
 @theme inline {

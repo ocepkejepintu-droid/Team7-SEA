@@ -1,7 +1,3 @@
-out/seg/
-out/soundtrack.wav
-out/render.log
-out/preview-*
-out/soundtrack-30s.wav
-out/render-30s.log
-out/render-story.log
+out/*
+!out/hai-pantai-explainer.mp4
+!out/poster.png

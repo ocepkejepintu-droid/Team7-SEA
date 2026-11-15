@@ -7,7 +7,7 @@ import type { GameState, Report, Size, TrashType } from "../../shared/types";
 import { SIZES, TRASH_TYPES } from "../../shared/types";
 import { beaches, snapToCoast } from "../../shared/coast";
 import { CLEAN_PASS, badges, challenge, cleanPoints, isHotspot, league, playerPoints, reportPoints } from "../../shared/game";
-import { compareCleanup, tagPhoto } from "./claude";
+import { asLang, compareCleanup, tagPhoto } from "./claude";
 import { createStore, publicPlayer, type Store, type StoredPlayer } from "./store";
 
 const MAX_BODY = 3 * 1024 * 1024;
@@ -147,10 +147,10 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
     const player = auth(req);
 
     if (route === "ai/tag") {
-      const body = (await readBody(req)) as { photo?: unknown };
+      const body = (await readBody(req)) as { photo?: unknown; lang?: unknown };
       const { b64 } = decodePhoto(body.photo);
       limit("a:" + ip(req), 240); useAi(player.token);
-      const t = await tagPhoto(b64);
+      const t = await tagPhoto(b64, asLang(body.lang));
       return json(res, 200, t ? { ...t, ai: true } : { isTrash: true, type: "mixed", size: "M", summary: "", ai: false });
     }
 
@@ -182,7 +182,7 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
     const m = route.match(/^reports\/([^/]+)\/clean$/);
     if (m) {
       const id = decodeURIComponent(m[1]);
-      const body = (await readBody(req)) as { photo?: unknown };
+      const body = (await readBody(req)) as { photo?: unknown; lang?: unknown };
       const report = store.db.reports.find((r) => r.id === id);
       if (!report) throw new HttpError(404, "Report not found");
       if (report.status !== "open" || cleaning.has(id)) throw new HttpError(409, "Already cleaned");
@@ -194,7 +194,7 @@ export function createApp(opts: { dataDir?: string; webDir?: string } = {}) {
         if (/\.jpe?g$/i.test(report.photo)) {
           try { beforeB64 = fs.readFileSync(path.join(store.photosDir, report.photo)).toString("base64"); } catch { beforeB64 = null; }
         }
-        const verdict = await compareCleanup(beforeB64, b64);
+        const verdict = await compareCleanup(beforeB64, b64, asLang(body.lang));
         const score = verdict ? verdict.score : 70;
         const reason = verdict ? verdict.reason : "Not checked by Claude";
         const verified = !!verdict;

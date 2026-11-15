@@ -6,6 +6,8 @@ import { Crosshair, Minus, Plus } from "lucide-react";
 import { beaches, beachById } from "@shared/coast";
 import { isHotspot } from "@shared/game";
 import type { BeachStanding, Report } from "@shared/types";
+import { useI18n } from "@/lib/i18n";
+import { useTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 export type MapMode = "map" | "satellite";
@@ -18,9 +20,11 @@ export interface GameMapHandle {
 
 const BALI: LngLatBoundsLike = [[114.42, -8.86], [115.72, -8.05]];
 const MAX_BOUNDS: LngLatBoundsLike = [[113.9, -9.3], [116.3, -7.6]];
-const SEA = "#cfe9ea";
-const LAND = "#fbf6ec";
-const LAND_EDGE = "#eadfc8";
+/** Base map colours per theme (match --sea, --canvas and --border in styles.css). `ring` outlines dots, `sel` the selected one. */
+const MAP_COLORS: Record<Theme, { sea: string; land: string; edge: string; ring: string; sel: string }> = {
+  light: { sea: "#cfe9ea", land: "#fbf6ec", edge: "#eadfc8", ring: "#ffffff", sel: "#12343b" },
+  dark: { sea: "#0d3a45", land: "#17333a", edge: "#2d4d54", ring: "#0a1c21", sel: "#ffffff" },
+};
 const CORAL = "#ff6b4a";
 const GOOD = "#22c55e";
 const AMBER = "#f59e0b";
@@ -51,6 +55,9 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
   pickLabel?: string;
   ref?: Ref<GameMapHandle>;
 }) {
+  const { t, lang } = useI18n();
+  const tRef = useRef(t); tRef.current = t;
+  const { theme } = useTheme();
   const box = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const [ready, setReady] = useState(false);
@@ -95,13 +102,14 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
     const open = s?.open ?? reportsRef.current.filter((r) => r.beachId === id && r.status === "open").length;
     const health = s?.rank != null ? `${s.health}` : "–";
     const color = healthColor(s);
+    const t = tRef.current;
     popupRef.current?.remove();
     popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 10, maxWidth: "240px", className: "pantai-popup" })
       .setLngLat(at ?? b.center)
       .setHTML(`<div class="pp-name">${esc(b.name)}</div><div class="pp-kab">${esc(b.kab)}</div>
-        <div class="pp-row"><span class="pp-dot" style="background:${color}"></span><b>${health}</b><span>health</span></div>
-        <div class="pp-row"><b>${open}</b><span>open ${open === 1 ? "report" : "reports"}</span></div>
-        <div class="pp-rank">${s?.rank != null ? `Rank #${s.rank} in the league` : "No data yet this week"}</div>`)
+        <div class="pp-row"><span class="pp-dot" style="background:${color}"></span><b>${health}</b><span>${esc(t("map.health"))}</span></div>
+        <div class="pp-row"><b>${open}</b><span>${esc(t("map.openReports", { count: open }))}</span></div>
+        <div class="pp-rank">${esc(s?.rank != null ? t("map.rank", { rank: s.rank }) : t("map.noData"))}</div>`)
       .addTo(map);
   };
 
@@ -112,8 +120,12 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
     center: () => { const c = mapRef.current?.getCenter(); return c ? [c.lng, c.lat] : null; },
   }));
 
+  // A beach popup is plain HTML in the old language: close it when the language changes.
+  useEffect(() => { popupRef.current?.remove(); }, [lang]);
+
   useEffect(() => {
     if (!box.current) return;
+    const c = MAP_COLORS[theme];
     const map = new maplibregl.Map({
       container: box.current,
       style: {
@@ -125,10 +137,10 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
           reports: { type: "geojson", data: reportData },
         },
         layers: [
-          { id: "bg", type: "background", paint: { "background-color": SEA } },
+          { id: "bg", type: "background", paint: { "background-color": c.sea } },
           { id: "sat", type: "raster", source: "sat", layout: { visibility: "none" } },
-          { id: "land", type: "fill", source: "land", paint: { "fill-color": LAND } },
-          { id: "land-edge", type: "line", source: "land", paint: { "line-color": LAND_EDGE, "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.4, 14, 1] } },
+          { id: "land", type: "fill", source: "land", paint: { "fill-color": c.land } },
+          { id: "land-edge", type: "line", source: "land", paint: { "line-color": c.edge, "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.4, 14, 1] } },
           { id: "coast-case", type: "line", source: "coast", layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
             paint: { "line-color": "#ffffff", "line-width": ["interpolate", ["linear"], ["zoom"], 8, 3.5, 10, 6.5, 12, 9.5, 15, 15] } },
           { id: "coast", type: "line", source: "coast", layout: { "line-cap": "round", "line-join": "round" },
@@ -136,9 +148,9 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
           { id: "halo", type: "circle", source: "reports", filter: ["==", ["get", "kind"], "hot"],
             paint: { "circle-color": CORAL, "circle-opacity": 0.3, "circle-radius": 14, "circle-blur": 0.2 } },
           { id: "r-clean", type: "circle", source: "reports", filter: ["==", ["get", "kind"], "clean"],
-            paint: { "circle-color": GOOD, "circle-stroke-color": ["case", ["get", "sel"], "#12343b", "#ffffff"], "circle-stroke-width": ["case", ["get", "sel"], 3, 1.5], "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, 3, 14, 5, 17, 7] } },
+            paint: { "circle-color": GOOD, "circle-stroke-color": ["case", ["get", "sel"], c.sel, c.ring], "circle-stroke-width": ["case", ["get", "sel"], 3, 1.5], "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, 3, 14, 5, 17, 7] } },
           { id: "r-open", type: "circle", source: "reports", filter: ["!=", ["get", "kind"], "clean"],
-            paint: { "circle-color": CORAL, "circle-stroke-color": ["case", ["get", "sel"], "#12343b", "#ffffff"], "circle-stroke-width": ["case", ["get", "sel"], 3, 2],
+            paint: { "circle-color": CORAL, "circle-stroke-color": ["case", ["get", "sel"], c.sel, c.ring], "circle-stroke-width": ["case", ["get", "sel"], 3, 2],
               "circle-radius": ["interpolate", ["linear"], ["zoom"], 9, ["case", ["==", ["get", "kind"], "hot"], 6.5, 4.5], 14, ["case", ["==", ["get", "kind"], "hot"], 9, 7], 17, ["case", ["==", ["get", "kind"], "hot"], 12, 9]] } },
         ],
       },
@@ -211,6 +223,18 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
   useEffect(() => { if (ready) (mapRef.current?.getSource("coast") as GeoJSONSource | undefined)?.setData(coastData); }, [coastData, ready]);
   useEffect(() => { if (ready) (mapRef.current?.getSource("reports") as GeoJSONSource | undefined)?.setData(reportData); }, [reportData, ready]);
 
+  // Recolour the base map when the theme changes. Satellite imagery is bright, so dots keep the light outline there.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    const c = MAP_COLORS[theme];
+    const dots = mode === "satellite" ? MAP_COLORS.light : c;
+    map.setPaintProperty("bg", "background-color", c.sea);
+    map.setPaintProperty("land", "fill-color", c.land);
+    map.setPaintProperty("land-edge", "line-color", c.edge);
+    for (const l of ["r-open", "r-clean"]) map.setPaintProperty(l, "circle-stroke-color", ["case", ["get", "sel"], dots.sel, dots.ring]);
+  }, [theme, mode, ready]);
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
@@ -268,23 +292,23 @@ export function GameMap({ reports, league, selectedId, onSelectReport, pick, onP
     }, () => setLocating(false), { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
   };
 
-  const btn = "grid size-11 place-items-center rounded-full bg-white text-foreground shadow-md shadow-black/15 active:scale-95 transition";
+  const btn = "grid size-11 place-items-center rounded-full bg-card text-foreground shadow-md shadow-black/15 active:scale-95 transition";
   return (
     <div className="absolute inset-0">
-      <div ref={box} className="size-full" role="region" aria-label="Map of the Bali coast with trash reports" />
+      <div ref={box} className="size-full" role="region" aria-label={t("map.aria")} />
       <div className="pointer-events-none absolute right-3 top-3 flex flex-col items-end gap-2">
-        <div className="pointer-events-auto flex h-11 rounded-full bg-white p-1 shadow-md shadow-black/15" role="group" aria-label="Map style">
+        <div className="pointer-events-auto flex h-11 rounded-full bg-card p-1 shadow-md shadow-black/15" role="group" aria-label={t("map.style")}>
           {(["map", "satellite"] as const).map((m) => (
             <button key={m} type="button" onClick={() => setMode(m)} aria-pressed={mode === m}
               className={cn("rounded-full px-3 text-sm font-bold transition", mode === m ? "bg-brand text-white" : "text-muted-foreground")}>
-              {m === "map" ? "Map" : "Satellite"}
+              {m === "map" ? t("map.map") : t("map.satellite")}
             </button>
           ))}
         </div>
-        <button type="button" className={cn(btn, "pointer-events-auto")} aria-label="Zoom in" onClick={() => mapRef.current?.zoomIn()}><Plus className="size-5" /></button>
-        <button type="button" className={cn(btn, "pointer-events-auto")} aria-label="Zoom out" onClick={() => mapRef.current?.zoomOut()}><Minus className="size-5" /></button>
+        <button type="button" className={cn(btn, "pointer-events-auto")} aria-label={t("map.zoomIn")} onClick={() => mapRef.current?.zoomIn()}><Plus className="size-5" /></button>
+        <button type="button" className={cn(btn, "pointer-events-auto")} aria-label={t("map.zoomOut")} onClick={() => mapRef.current?.zoomOut()}><Minus className="size-5" /></button>
         {canLocate() && (
-          <button type="button" className={cn(btn, "pointer-events-auto", locating && "text-brand animate-pulse")} aria-label="Locate me" onClick={locate}><Crosshair className="size-5" /></button>
+          <button type="button" className={cn(btn, "pointer-events-auto", locating && "text-brand animate-pulse")} aria-label={t("map.locate")} onClick={locate}><Crosshair className="size-5" /></button>
         )}
       </div>
     </div>

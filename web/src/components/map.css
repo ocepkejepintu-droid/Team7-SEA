@@ -1,16 +1,22 @@
-/* Hai Pantai map and sheet styles (hex colours: MapLibre DOM lives outside Tailwind's reach here). */
+/* Hai Pantai map and sheet styles (plain CSS with theme variables: MapLibre DOM lives outside Tailwind's reach here). */
 .maplibregl-map { font-family: inherit; }
-.maplibregl-ctrl-attrib.maplibregl-compact { margin: 0 0 6px 6px !important; background: rgba(255, 255, 255, 0.85); font-size: 11px; }
+.maplibregl-ctrl-attrib.maplibregl-compact { margin: 0 0 6px 6px !important; background: color-mix(in srgb, var(--card) 85%, transparent); color: var(--foreground); font-size: 11px; }
+.maplibregl-ctrl-attrib a { color: inherit; }
+:root[data-theme="dark"] .maplibregl-ctrl-attrib-button { filter: invert(1); }
 .maplibregl-ctrl-bottom-left { z-index: 1; }
 
-.pantai-popup .maplibregl-popup-content { border-radius: 18px; padding: 12px 14px 12px; box-shadow: 0 8px 28px rgba(18, 52, 59, 0.18); color: #12343b; min-width: 170px; }
-.pantai-popup .maplibregl-popup-close-button { font-size: 20px; width: 32px; height: 32px; right: 2px; top: 2px; color: #5d7377; border-radius: 999px; }
+.pantai-popup .maplibregl-popup-content { border-radius: 18px; padding: 12px 14px 12px; box-shadow: 0 8px 28px rgba(18, 52, 59, 0.18); background: var(--card); color: var(--foreground); min-width: 170px; }
+.pantai-popup[class*="anchor-bottom"] .maplibregl-popup-tip { border-top-color: var(--card); }
+.pantai-popup[class*="anchor-top"] .maplibregl-popup-tip { border-bottom-color: var(--card); }
+.pantai-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--card); }
+.pantai-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--card); }
+.pantai-popup .maplibregl-popup-close-button { font-size: 20px; width: 32px; height: 32px; right: 2px; top: 2px; color: var(--muted-foreground); border-radius: 999px; }
 .pantai-popup .pp-name { font-weight: 800; font-size: 16px; line-height: 1.2; padding-right: 22px; }
-.pantai-popup .pp-kab { color: #5d7377; font-size: 12px; margin-bottom: 8px; }
-.pantai-popup .pp-row { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #5d7377; }
-.pantai-popup .pp-row b { color: #12343b; font-size: 15px; font-weight: 800; }
+.pantai-popup .pp-kab { color: var(--muted-foreground); font-size: 12px; margin-bottom: 8px; }
+.pantai-popup .pp-row { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); }
+.pantai-popup .pp-row b { color: var(--foreground); font-size: 15px; font-weight: 800; }
 .pantai-popup .pp-dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; }
-.pantai-popup .pp-rank { margin-top: 8px; font-size: 12px; font-weight: 700; color: #0b6b68; background: #e6f5f4; border-radius: 999px; padding: 4px 10px; display: inline-block; }
+.pantai-popup .pp-rank { margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--brand-ink); background: var(--brand-soft); border-radius: 999px; padding: 4px 10px; display: inline-block; }
 
 .pick-pin { display: flex; flex-direction: column; align-items: center; cursor: grab; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25)); }
 .pick-pin:active { cursor: grabbing; }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BADGES } from "@shared/types";
+import { badgeName, useI18n } from "@/lib/i18n";
 import "./map.css";
 
 export interface PointsEvent { points: number; title: string; badges?: string[] }
@@ -10,6 +11,7 @@ const listeners = new Set<(e: PointsEvent) => void>();
 export function showPoints(e: PointsEvent) { for (const l of listeners) l(e); }
 
 export function PointsToast() {
+  const { t } = useI18n();
   const [items, setItems] = useState<Item[]>([]);
   useEffect(() => {
     let n = 0;
@@ -25,16 +27,16 @@ export function PointsToast() {
   const it = items[items.length - 1];
   return (
     <div className="pointer-events-none fixed inset-x-0 top-[28%] z-[60] flex justify-center px-6" aria-live="polite">
-      <div key={it.key} className="points-pop flex max-w-xs flex-col items-center rounded-3xl bg-white/95 px-7 py-5 text-center shadow-2xl shadow-brand/30"
+      <div key={it.key} className="points-pop flex max-w-xs flex-col items-center rounded-3xl bg-card/95 px-7 py-5 text-center shadow-2xl shadow-brand/30"
         style={it.badges?.length ? { animationDuration: "4200ms" } : undefined}>
         <div className="text-6xl font-black leading-none tracking-tight text-brand">{it.points > 0 ? `+${it.points}` : "0"}</div>
-        <div className="mt-1 text-sm font-extrabold uppercase tracking-wide text-brand-ink">points</div>
+        <div className="mt-1 text-sm font-extrabold uppercase tracking-wide text-brand-ink">{t("toast.points")}</div>
         <div className="mt-2 text-base font-bold text-foreground">{it.title}</div>
         {!!it.badges?.length && (
           <div className="mt-3 flex flex-col gap-1.5">
             {it.badges.map((b) => (
               <div key={b} className="flex items-center gap-2 rounded-full bg-amber-soft px-3 py-1.5 text-sm font-bold text-amber-ink">
-                <span className="text-lg">{BADGES[b]?.emoji ?? "🏅"}</span> New badge: {BADGES[b]?.name ?? b}
+                <span className="text-lg">{BADGES[b]?.emoji ?? "🏅"}</span> {t("toast.newBadge", { name: badgeName(t, b) })}
               </div>
             ))}
           </div>
