@@ -1,0 +1,9 @@
+{
+  "name": "hai-pantai-built-in-one-hour",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "audio": "node audio.mjs",
+    "render": "node render.mjs"
+  }
+}
