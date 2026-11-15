@@ -52,8 +52,19 @@ ssh ubuntu@43.163.0.197 'tar xzf pantai.tgz && sudo bash pantai/deploy/setup.sh'
 
 Running it again updates the app and keeps the data.
 
+### Domain and HTTPS (haipantai.online)
+
+1. At the domain registrar, add two A records pointing at `43.163.0.197`: `haipantai.online` (host `@`) and `www`.
+2. Once they resolve (`dig +short haipantai.online` prints the IP), run on the VPS:
+
+```bash
+ssh ubuntu@43.163.0.197 'sudo bash pantai/deploy/domain.sh haipantai.online'
+```
+
+`domain.sh` checks the DNS, adds an nginx site for the domain that proxies to the app on port 8791, and gets a Let's Encrypt certificate with certbot (HTTP redirects to HTTPS, renewal is automatic). The app is then at `https://haipantai.online/`, and `http://43.163.0.197/pantai/` keeps working.
+
 ## Limits
 
-- The VPS is plain HTTP, so browsers block GPS there. The "Locate me" button only shows on HTTPS or localhost; the pin can always be placed by hand.
+- On the bare-IP address (plain HTTP) browsers block GPS, so "Locate me" only shows on `https://haipantai.online` or localhost; the pin can always be placed by hand.
 - No accounts, moderation or duplicate detection. A player is a nickname and a token in the browser.
 - Seeded reports are demo data with illustrated placeholders, and are labelled "demo".
