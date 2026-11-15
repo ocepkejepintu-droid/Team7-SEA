@@ -1,0 +1,10 @@
+{
+  "name": "hai-pantai-launch-video",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "geo": "node build-geo.mjs",
+    "audio": "node audio.mjs",
+    "render": "node render.mjs"
+  }
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hai Pantai 30s</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage"><div class="grain" id="grain"></div></div>
+<script>window.SHORT = true;</script>
+<script src="timeline.js"></script>
+<script src="short-timeline.js"></script>
+<script src="geo.js"></script>
+<script src="lib.js"></script>
+<script src="art.js"></script>
+<script src="scenes-a.js"></script>
+<script src="scenes-b.js"></script>
+<script src="scenes-c.js"></script>
+<script>
+  const stage = $("#stage"), grain = $("#grain");
+  const byName = {};
+  for (const sc of SCENES) {
+    if (!SHORT_TL.SHOTS.some((s) => s.scene === sc.name)) continue;
+    sc.root = document.createElement("div");
+    sc.root.className = "scene"; sc.root.dataset.name = sc.name;
+    stage.insertBefore(sc.root, grain);
+    sc.build(sc.root);
+    byName[sc.name] = sc;
+  }
+  const SHOTS = SHORT_TL.SHOTS, XF = 0.22; // crossfade between different scenes
+  window.DURATION = SHORT_TL.DURATION;
+  const show = (sc, on, o = 1, z = 1) => {
+    const v = on ? "visible" : "hidden";
+    if (sc.root.style.visibility !== v) sc.root.style.visibility = v;
+    const os = o.toFixed(3); if (sc.root.style.opacity !== os) sc.root.style.opacity = os;
+    if (sc.root.style.zIndex !== String(z)) sc.root.style.zIndex = String(z);
+  };
+  window.renderFrame = (t) => {
+    let i = SHOTS.findIndex((s) => t >= s.t0 && t < s.t0 + s.dur);
+    if (i < 0) i = SHOTS.length - 1;
+    const cur = SHOTS[i], next = SHOTS[i + 1];
+    const into = t - cur.t0, left = cur.dur - into;
+    const live = new Set([cur.scene]);
+    byName[cur.scene].update(cur.a + into * cur.speed, byName[cur.scene].root);
+    let xo = 0;
+    if (next && next.scene !== cur.scene && left < XF) {
+      xo = E.inOutSine(1 - left / XF);
+      byName[next.scene].update(next.a, byName[next.scene].root);
+      live.add(next.scene);
+    }
+    for (const [name, sc] of Object.entries(byName)) {
+      if (!live.has(name)) show(sc, false);
+      else if (name === cur.scene) show(sc, true, 1, 1);
+      else show(sc, true, xo, 2);
+    }
+    grain.style.transform = `translate(${(Math.sin(t * 91) * 40).toFixed(0)}px,${(Math.cos(t * 77) * 40).toFixed(0)}px)`;
+  };
+  window.ready = document.fonts.ready.then(() => Promise.all([...document.images].map((im) => im.decode().catch(() => {})))).then(() => true);
+  const qs = new URLSearchParams(location.search);
+  if (qs.has("t")) window.ready.then(() => renderFrame(+qs.get("t")));
+  if (qs.has("play")) {
+    const t0 = performance.now() - (+qs.get("play") || 0) * 1000;
+    const loop = () => { renderFrame(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+    window.ready.then(loop);
+  }
+</script>
+</body>
+</html>
